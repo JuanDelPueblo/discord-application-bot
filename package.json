@@ -1,0 +1,26 @@
+{
+  "name": "discord-whitelist-bot",
+  "version": "1.0.0",
+  "description": "A Discord Bot for accepting or denying users based on their form submissions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JuanDelPueblo/discord-whitelist-bot.git"
+  },
+  "keywords": [
+    "discord",
+    "whitelist",
+    "bot",
+    "forms",
+    "moderation"
+  ],
+  "author": "JuanDelPueblo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JuanDelPueblo/discord-whitelist-bot/issues"
+  },
+  "homepage": "https://github.com/JuanDelPueblo/discord-whitelist-bot#readme"
+}
