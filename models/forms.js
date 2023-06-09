@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			primaryKey: true,
 		},
+		form_role: {
+			type: DataTypes.JSON,
+			allowNull: false,
+		},
 		form_questions: {
 			type: DataTypes.JSON,
 			allowNull: false,

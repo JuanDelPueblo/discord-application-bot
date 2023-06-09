@@ -14,73 +14,70 @@ const Forms = require('./models/forms.js')(sequelize, Sequelize.DataTypes);
 const Applications = require('./models/applications.js')(sequelize, Sequelize.DataTypes);
 
 Applications.belongsTo(Forms, { foreignKey: 'form_channel_id', as: 'form' });
+Forms.hasMany(Applications, { foreignKey: 'form_channel_id', as: 'applications' });
 
-// Get applications for a specific user and form channel ID.
+// Get applications for a specific form thread ID.
 Reflect.defineProperty(Applications.prototype, 'get', {
-	value: async function (user_id, form_channel_id) {
-		const form = await Applications.findOne({
+	value: function (form_thread_id) {
+		return Applications.findOne({
 			where: {
-				user_id,
-				form_channel_id,
+				form_thread_id,
 			},
 			include: 'form',
 		});
-		return form;
+
 	}
 });
 
 // Get all applications for a specific form channel ID.
 Reflect.defineProperty(Applications.prototype, 'getAll', {
-	value:	async function (form_channel_id) {
-		const forms = await Applications.findAll({
+	value: function (form_channel_id) {
+		return Applications.findAll({
 			where: {
 				form_channel_id,
 			},
 			include: 'form',
 		});
-		return forms;
 	}
 });
 
 // Create a new form.
 Reflect.defineProperty(Forms.prototype, 'create', {
-	value: async function (user_id, form_channel_id, form_data, submitted_at) {
-		const form = await Forms.create({
+	value: function (form_channel_id, form_role, form_questions, action_data, enabled) {
+		return Forms.create({
 			form_channel_id,
-			form_questions,
+			form_role, 
+			form_questions, 
 			action_data,
+			enabled,
 		});
-		return form;
 	}
 });
 
-// Delete an application for a specific user and form channel ID.
+// Delete an application for a specific user, form channel ID, and form thread ID.
 Reflect.defineProperty(Applications.prototype, 'delete', {
-	value: async function (user_id, form_channel_id) {
-		const form = await Applications.destroy({
+	value: function (form_thread_id) {
+		return Applications.destroy({
 			where: {
-				user_id,
-				form_channel_id,
+				form_thread_id,
 			},
 		});
-		return form;
 	}
 });
 
 // Delete a form and all applications for a specific form channel ID.
 Reflect.defineProperty(Forms.prototype, 'deleteAll', {
 	value: async function (form_channel_id) {
-		const forms = await Forms.destroy({
+		await Applications.destroy({
 			where: {
 				form_channel_id,
 			},
 		});
-		const applications = await Applications.destroy({
+		return Forms.destroy({
 			where: {
 				form_channel_id,
 			},
 		});
-		return forms;
 	}
 });
 
