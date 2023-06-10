@@ -25,7 +25,7 @@ module.exports = {
 			subcommand.setName('unset')
 				.setDescription('Unsets a role to view, approve, or deny forms')
 				.addRoleOption(option =>
-					option.setName('name')
+					option.setName('role')
 						.setDescription('The role to unset permissions for')
 						.setRequired(true)
 				)

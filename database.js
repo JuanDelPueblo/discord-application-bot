@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize');
-const { prototype } = require('ws');
 
 const sequelize = new Sequelize({
 	host: 'localhost',
@@ -8,9 +7,7 @@ const sequelize = new Sequelize({
 	logging: false,
 });
 
-// Contains the form channel ID, the questions, the actions to take on approval or denial, and whether the form is enabled or not.
 const Forms = require('./models/forms.js')(sequelize, Sequelize.DataTypes);
-// Contains	the form channel ID, the thread ID, the user ID, the answers to the questions, and the time the form was submitted.
 const Applications = require('./models/applications.js')(sequelize, Sequelize.DataTypes);
 
 Applications.belongsTo(Forms, { foreignKey: 'form_channel_id', as: 'form' });
