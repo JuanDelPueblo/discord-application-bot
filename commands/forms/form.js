@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { t } = require('tar');
 
 module.exports = {
 	cooldown: 3,
