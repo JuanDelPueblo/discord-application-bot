@@ -1,4 +1,5 @@
 const {  ApplicationCommandOptionType, SlashCommandBuilder } = require('discord.js');
+const config = require('../../config.json');
 
 module.exports = {
 	cooldown: 3,
@@ -9,7 +10,7 @@ module.exports = {
 		const commands = interaction.client.commands;
 
 		const embed = {
-			color: 0x0099ff,
+			color: config.color,
 			title: 'Commands',
 			description: 'All commands\n [] = optional, <> = required',
 			fields: [],

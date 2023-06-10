@@ -10,6 +10,7 @@ module.exports = (rootDir) => {
         const initialConfig = {
           token: 'your-token-here',
           clientId: 'your-client-id-here',
+          color: "#0099ff",
           DO_NOT_EDIT: 'THE FOLLOWING VALUES ARE AUTO-GENERATED. DO NOT EDIT THEM UNLESS YOU KNOW WHAT YOU ARE DOING.',
           commandsDeployed: false,
           databaseDeployed: false,
