@@ -11,7 +11,12 @@ function main() {
 	client.commands = new Collection();
 	client.cooldowns = new Collection();
 	const foldersPath = path.join(__dirname, 'commands');
-	const commandFolders = fs.readdirSync(foldersPath);
+	let commandFolders = fs.readdirSync(foldersPath);
+
+	commandFolders = commandFolders.filter((folder) => {
+        const folderPath = path.resolve(foldersPath, folder);
+        return fs.lstatSync(folderPath).isDirectory();
+    });
 
 	for (const folder of commandFolders) {
 		const commandsPath = path.join(foldersPath, folder);

@@ -7,7 +7,12 @@ function loadCommands(rootDir) {
     try {
       const commands = [];
       const foldersPath = path.resolve(rootDir, 'commands');
-      const commandFolders = await fs.promises.readdir(foldersPath);
+      let commandFolders = await fs.promises.readdir(foldersPath);
+
+      commandFolders = commandFolders.filter((folder) => {
+        const folderPath = path.resolve(foldersPath, folder);
+        return fs.lstatSync(folderPath).isDirectory();
+      });
 
       for (const folder of commandFolders) {
         const commandsPath = path.resolve(foldersPath, folder);
