@@ -54,6 +54,17 @@ module.exports = {
 				)
 		),
 	async execute(interaction) {
-		await interaction.reply('Action!');
+		const subcommand = interaction.options.getSubcommand();
+		switch (subcommand) {
+		case 'set':
+			await interaction.reply('Set!');
+			break;
+		case 'unset':
+			await interaction.reply('Unset!');
+			break;
+		default:
+			await interaction.reply('Not recognized!');
+			break;
+		}
 	},
 };

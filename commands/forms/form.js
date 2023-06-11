@@ -35,6 +35,32 @@ module.exports = {
 			subcommand.setName('editprompt')
 				.setDescription('Edit the application prompt')),
 	async execute(interaction) {
-		await interaction.reply('form!');
+		const subcommand = interaction.options.getSubcommand();
+		switch (subcommand) {
+		case 'submit':
+			await interaction.reply('Submit!');
+			break;
+		case 'setup':
+			await interaction.reply('Setup!');
+			break;
+		case 'export':
+			await interaction.reply('Export!');
+			break;
+		case 'erase':
+			await interaction.reply('Erase!');
+			break;
+		case 'editquestions':
+			await interaction.reply('Edit Questions!');
+			break;
+		case 'showquestions':
+			await interaction.reply('Show Questions!');
+			break;
+		case 'editprompt':
+			await interaction.reply('Edit Prompt!');
+			break;
+		default:
+			await interaction.reply('Not recognized!');
+			break;
+		}
 	}
 };
