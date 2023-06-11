@@ -27,3 +27,11 @@ module.exports = ( sequelize, DataTypes ) => {
 		timestamps: false,
 	});
 };
+
+// form_answers is a JSON object that looks like this:
+// {
+// 	"1": "John Doe",
+// 	"2": 21,
+// 	"3": ["Option 1", "Option 2"],
+// 	"4": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+// }
