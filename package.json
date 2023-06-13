@@ -1,7 +1,7 @@
 {
   "name": "discord-application-bot",
   "version": "1.0.0",
-  "description": "A Discord Bot for accepting or denying users based on their form submissions",
+  "description": "A Discord Bot for accepting or rejecting users based on their form submissions",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

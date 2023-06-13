@@ -13,16 +13,16 @@ module.exports = ( sequelize, DataTypes ) => {
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
-		finished: { // whether the application was finished
-			type: DataTypes.BOOLEAN,
-			allowNull: false,
-		},
-		approved: { // whether the application was approved
+		submitted: { // whether the application has submitted his form
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
 		},
 		submitted_at: { // date the application was submitted
 			type: DataTypes.DATE,
+			allowNull: false,
+		},
+		approved: { // whether the application was approved or rejected
+			type: DataTypes.BOOLEAN,
 			allowNull: false,
 		},
 	}, {

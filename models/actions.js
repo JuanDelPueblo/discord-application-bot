@@ -7,12 +7,13 @@ module.exports = (sequelize, DataTypes) => {
 		name: { // name of the action
 			type: DataTypes.STRING,
 			allowNull: false,
+			unique: true,
 		},
-		type: { // 'approve' or 'deny'
+		when: { // 'approved' or 'rejected'
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
-		action_to_take: { // choices in /commands/form/action.js
+		do: { // choices in /commands/form/action.js
 			type: DataTypes.STRING,
 			allowNull: false,
 		},

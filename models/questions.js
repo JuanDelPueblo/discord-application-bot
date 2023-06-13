@@ -29,11 +29,11 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
 		},
-		min: { // minimum number of characters of text, lowest number allowed, minimum number of options, minimum number of files
+		min: { // minimum characters of text, lowest number allowed, minimum number of options, minimum number of files
 			type: DataTypes.INTEGER,
 			allowNull: true,
 		},
-		max: { // maximum number of characters of text, highest number allowed, maximum number of options, maximum number of files
+		max: { // maximum characters of text, highest number allowed, maximum number of options, maximum number of files
 			type: DataTypes.INTEGER,
 			allowNull: true,
 		},

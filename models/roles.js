@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: false,
 			defaultValue: false,
 		},
-		can_take_action: { // whether the role can approve or deny applications
+		can_take_action: { // whether the role can approve or reject applications
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
 			defaultValue: false,
