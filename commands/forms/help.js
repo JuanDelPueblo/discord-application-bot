@@ -1,4 +1,4 @@
-const {  ApplicationCommandOptionType, SlashCommandBuilder } = require('discord.js');
+const {  ApplicationCommandOptionType, EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const config = require('../../config.json');
 
 module.exports = {
@@ -9,12 +9,10 @@ module.exports = {
 	async execute(interaction) {
 		const commands = interaction.client.commands;
 
-		const embed = {
-			color: config.color,
-			title: 'Commands',
-			description: 'All commands\n [] = optional, <> = required',
-			fields: [],
-		};
+		const embed = new EmbedBuilder()
+			.setColor(config.color)
+			.setTitle('Commands')
+			.setDescription('All commands\n [] = optional, <> = required');
 
 		commands.forEach(command => {
 			if (command.data.options.length > 0) {
@@ -30,14 +28,14 @@ module.exports = {
 								}
 							});
 						}
-						embed.fields.push({
+						embed.addFields({
 							name: `/${command.data.name} ${option.name}${args}`,
 							value: option.description,
 						});
 					}
 				});
 			} else {
-				embed.fields.push({
+				embed.addFields({
 					name: `/${command.data.name}`,
 					value: command.data.description,
 				});
