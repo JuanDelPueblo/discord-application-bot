@@ -6,22 +6,28 @@ module.exports = {
 		.setName('action')
 		.setDescription('Configures the actions for the current form')
 		.addSubcommand(subcommand =>
-			subcommand.setName('set')
-				.setDescription('Set an action to take on approval or denial')
-				.addStringOption(option =>
-					option.setName('type')
-						.setDescription('Approve or Deny action')
-						.setRequired(true)
-						.addChoices(
-							{ name: 'Approve', value: 'approve' },
-							{ name: 'Deny', value: 'deny' }
-						))
+			subcommand.setName('list')
+				.setDescription('Lists the actions for the current form')
+		)
+		.addSubcommand(subcommand =>
+			subcommand.setName('add')
+				.setDescription('Add an action to take on approval or rejection')
 				.addStringOption(option =>
 					option.setName('name')
 						.setDescription('Name to identify the action with')
-						.setRequired(true))
+						.setRequired(true)
+				)
 				.addStringOption(option =>
-					option.setName('action')
+					option.setName('when')
+						.setDescription('When to take the action')
+						.setRequired(true)
+						.addChoices(
+							{ name: 'Approved', value: 'approved' },
+							{ name: 'Rejected', value: 'rejected' }
+						)
+				)
+				.addStringOption(option =>
+					option.setName('do')
 						.setDescription('The action to take')
 						.setRequired(true)
 						.addChoices(
@@ -37,16 +43,8 @@ module.exports = {
 				)
 		)
 		.addSubcommand(subcommand =>
-			subcommand.setName('unset')
-				.setDescription('Unsets an action to take on approval or denial')
-				.addStringOption(option =>
-					option.setName('type')
-						.setDescription('Approve or Deny action')
-						.setRequired(true)
-						.addChoices(
-							{ name: 'Approve', value: 'approve' },
-							{ name: 'Deny', value: 'deny' }
-						))
+			subcommand.setName('remove')
+				.setDescription('Removes an action to take on approval or rejection')
 				.addStringOption(option =>
 					option.setName('name')
 						.setDescription('Name that identifies the action')
@@ -56,11 +54,14 @@ module.exports = {
 	async execute(interaction) {
 		const subcommand = interaction.options.getSubcommand();
 		switch (subcommand) {
-		case 'set':
-			await interaction.reply('Set!');
+		case 'list':
+			await interaction.reply('List!');
 			break;
-		case 'unset':
-			await interaction.reply('Unset!');
+		case 'add':
+			await interaction.reply('Add!');
+			break;
+		case 'remove':
+			await interaction.reply('Remove!');
 			break;
 		default:
 			await interaction.reply('Not recognized!');
