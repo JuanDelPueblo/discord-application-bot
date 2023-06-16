@@ -28,7 +28,17 @@
   "homepage": "https://github.com/JuanDelPueblo/discord-application-bot#readme",
   "dependencies": {
     "discord.js": "^14.11.0",
+    "module-alias": "^2.2.3",
     "sequelize": "^6.32.0",
     "sqlite3": "^5.1.6"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@commands": "commands",
+    "@events": "events",
+    "@models": "models",
+    "@utils": "utils",
+    "@config": "config.json",
+    "@database": "database.js"
   }
 }

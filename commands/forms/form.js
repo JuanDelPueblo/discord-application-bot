@@ -1,72 +1,7 @@
 const { ActionRowBuilder, channelMention, ModalBuilder, TextInputBuilder, TextInputStyle, SlashCommandBuilder } = require('discord.js');
-const { Forms } = require('../../database.js');
-
-function editFormModal(interaction) {
-	return new Promise((resolve, reject) => {
-		const modal = new ModalBuilder()
-			.setCustomId(`edit_form-${interaction.channel.id}`)
-			.setTitle('Edit Form Details');
-
-		const formTitleInput = new TextInputBuilder()
-			.setCustomId(`form_title-${interaction.channel.id}`)
-			.setLabel('Form Title')
-			.setStyle(TextInputStyle.Short);
-
-		const formDescriptionInput = new TextInputBuilder()
-			.setCustomId(`form_description-${interaction.channel.id}`)
-			.setLabel('Form Description')
-			.setStyle(TextInputStyle.Paragraph);
-
-		const formButtonTextInput = new TextInputBuilder()
-			.setCustomId(`form_button_text-${interaction.channel.id}`)
-			.setLabel('Form Button Text')
-			.setPlaceholder('New Application')
-			.setStyle(TextInputStyle.Short);
-
-		const titleRow = new ActionRowBuilder()
-			.addComponents(formTitleInput);
-
-		const descriptionRow = new ActionRowBuilder()
-			.addComponents(formDescriptionInput);
-
-		const buttonTextRow = new ActionRowBuilder()
-			.addComponents(formButtonTextInput);
-
-		modal.addComponents(titleRow, descriptionRow, buttonTextRow);
-
-		interaction.showModal(modal)
-			.then(() => {
-				const filter = i => i.customId.startsWith(`edit_form-${interaction.channel.id}`);
-				interaction.awaitModalSubmit({ time: 43_200_000, filter })
-					.then(async (modalInteraction) => {
-						const formTitle = modalInteraction.fields.getTextInputValue(`form_title-${interaction.channel.id}`);
-						const formDescription = modalInteraction.fields.getTextInputValue(`form_description-${interaction.channel.id}`);
-						const formButtonText = modalInteraction.fields.getTextInputValue(`form_button_text-${interaction.channel.id}`);
-
-						try {
-							await Forms.upsert(
-								{
-								  form_channel_id: interaction.channel.id,
-								  title: formTitle,
-								  description: formDescription,
-								  button_text: formButtonText,
-								},
-								{ where: { form_channel_id: interaction.channel.id } }
-							  );
-							resolve();
-						} catch (err) {
-							reject(err);
-						}
-					})
-					.catch(err => {
-						reject(err);
-					});
-			})
-			.catch(reject);
-	});
-}
-
-
+const { Forms } = require('@database');
+const { setup } = require('./form/setup.js');
+const { edit } = require('./form/edit.js');
 
 module.exports = {
 	cooldown: 3,
@@ -103,8 +38,9 @@ module.exports = {
 				.setDescription('Lists all forms and their respective channels')
 		),
 	async execute(interaction) {
-		const subcommand = interaction.options.getSubcommand();
+		const subcommand = await interaction.options.getSubcommand();
 		const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+		const messages = await interaction.channel.messages.fetch();
 
 		if (!currentForm && !['list', 'setup'].includes(subcommand)) {
 			await interaction.reply('This channel is not a form channel!');
@@ -118,13 +54,10 @@ module.exports = {
 			case 'setup':
 				if (currentForm) {
 					await interaction.reply('This channel is already a form channel!');
+				} else if (messages.size > 1) {
+					await interaction.reply('This channel already has messages! Please start from a empty channel.');
 				} else {
-					editFormModal(interaction)
-						.then(() => interaction.reply('Form created!'))
-						.catch(err => {
-							console.error(err);
-							interaction.reply('Something went wrong!');
-						});
+					await setup(interaction);
 				}
 				break;
 			case 'export':
@@ -134,12 +67,7 @@ module.exports = {
 				await interaction.reply('Erase!');
 				break;
 			case 'edit':
-				editFormModal(interaction)
-					.then(() => interaction.reply('Form edited!'))
-					.catch(err => {
-						console.error(err);
-						interaction.reply('Something went wrong!');
-					});
+				await edit(interaction, currentForm);
 				break;
 			case 'list':
 				const forms = await Forms.findAll();

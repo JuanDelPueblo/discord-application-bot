@@ -1,10 +1,11 @@
+require('module-alias/register')
 const fs = require('fs');
 const path = require('path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const configInit = require('./initializers/configInit.js');
 
 function main() {
-	const { token } = require('./config.json');
+	const { token } = require('@config');
 
 	const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 

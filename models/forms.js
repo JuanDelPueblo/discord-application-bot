@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
+		embed_message_id: { // message ID of the form embed
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
 		enabled: { // whether the form is open for submissions
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
