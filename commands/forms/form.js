@@ -1,7 +1,8 @@
-const { ActionRowBuilder, channelMention, ModalBuilder, TextInputBuilder, TextInputStyle, SlashCommandBuilder } = require('discord.js');
+const { channelMention, SlashCommandBuilder } = require('discord.js');
 const { Forms } = require('@database');
 const { setup } = require('./form/setup.js');
 const { edit } = require('./form/edit.js');
+const { erase } = require('./form/erase.js');
 
 module.exports = {
 	cooldown: 3,
@@ -43,7 +44,7 @@ module.exports = {
 		const messages = await interaction.channel.messages.fetch();
 
 		if (!currentForm && !['list', 'setup'].includes(subcommand)) {
-			await interaction.reply('This channel is not a form channel!');
+			await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true});
 			return;
 		}
 
@@ -53,9 +54,9 @@ module.exports = {
 				break;
 			case 'setup':
 				if (currentForm) {
-					await interaction.reply('This channel is already a form channel!');
+					await interaction.reply({ content: 'This channel is already a form channel!', ephemeral: true});
 				} else if (messages.size > 1) {
-					await interaction.reply('This channel already has messages! Please start from a empty channel.');
+					await interaction.reply({ content: 'This channel already has messages! Please start from a empty channel.', ephemeral: true});
 				} else {
 					await setup(interaction);
 				}
@@ -64,18 +65,22 @@ module.exports = {
 				await interaction.reply('Export!');
 				break;
 			case 'erase':
-				await interaction.reply('Erase!');
+				await erase(interaction, currentForm)
 				break;
 			case 'edit':
 				await edit(interaction, currentForm);
 				break;
 			case 'list':
 				const forms = await Forms.findAll();
-				const formsList = forms.map(form => `${channelMention(form.form_channel_id)} - ${form.title}`);
-				await interaction.reply(formsList.join('\n'));
+				if (forms.length === 0) {
+					await interaction.reply({ content: 'No forms found!', ephemeral: true});
+				} else {
+					const formsList = forms.map(form => `${channelMention(form.form_channel_id)} - ${form.title}`);
+					await interaction.reply({ content: formsList.join('\n'), ephemeral: true});
+				}
 				break;
 			default:
-				await interaction.reply('Not recognized!');
+				await interaction.reply({ content: 'Not recognized!', ephemeral: true});
 				break;
 		}
 	}
