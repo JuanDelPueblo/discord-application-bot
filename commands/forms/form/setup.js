@@ -2,9 +2,8 @@ const { Forms } = require('@database');
 const { editFormModal } = require('@utils/modals.js');
 const { embedForm } = require('@utils/embeds.js');
 
-module.exports = {
-	async setup(interaction) {
-		editFormModal(interaction)
+async function setup(interaction) {
+	editFormModal(interaction)
 		.then(() => {
 			const filter = i => i.customId.startsWith(`edit_form-${interaction.channel.id}`);
 			return interaction.awaitModalSubmit({ time: 43_200_000, filter });
@@ -27,12 +26,13 @@ module.exports = {
 			interaction.channel.send(embed)
 				.then(message => {
 					Forms.update({ embed_message_id: message.id }, { where: { form_channel_id: interaction.channel.id } });
-					modalInteraction.reply({ content: 'Form setup complete!', ephemeral: true});
+					modalInteraction.reply({ content: 'Form setup complete!', ephemeral: true });
 				});
 		})
 		.catch((err) => {
 			console.log(err);
 			interaction.followUp({ content: 'Form setup cancelled or something went wrong!', ephemeral: true });
 		});
-	}
 }
+
+module.exports = { setup }
