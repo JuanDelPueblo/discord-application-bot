@@ -3,6 +3,7 @@ const { Forms } = require('@database');
 const { setup } = require('./form/setup.js');
 const { edit } = require('./form/edit.js');
 const { erase } = require('./form/erase.js');
+const { submit } = require('./form/submit.js');
 
 module.exports = {
 	cooldown: 3,
@@ -50,7 +51,7 @@ module.exports = {
 
 		switch (subcommand) {
 			case 'submit':
-				await interaction.reply('Submit!');
+				await submit(interaction, currentForm);
 				break;
 			case 'setup':
 				if (currentForm) {
