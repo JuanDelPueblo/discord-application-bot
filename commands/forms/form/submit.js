@@ -1,6 +1,6 @@
 const { Forms } = require('@database');
 
-async function submit(interaction, currentForm) {
+async function submitCommand(interaction, currentForm) {
 	if (currentForm.questions) {
 		const newState = await interaction.options.getBoolean('state');
 		await Forms.update({ enabled: newState }, { where: { form_channel_id: interaction.channel.id } });
@@ -10,4 +10,4 @@ async function submit(interaction, currentForm) {
 	}
 }
 
-module.exports = { submit }
+module.exports = { submitCommand }

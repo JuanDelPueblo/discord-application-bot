@@ -2,7 +2,7 @@ const { Forms } = require('@database');
 const { editFormModal } = require('@utils/modals.js');
 const { embedForm } = require('@utils/embeds.js');
 
-async function setup(interaction) {
+async function setupCommand(interaction) {
 	editFormModal(interaction)
 		.then(() => {
 			const filter = i => i.customId.startsWith(`edit_form-${interaction.channel.id}`);
@@ -35,4 +35,4 @@ async function setup(interaction) {
 		});
 }
 
-module.exports = { setup }
+module.exports = { setupCommand }

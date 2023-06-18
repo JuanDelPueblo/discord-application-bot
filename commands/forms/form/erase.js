@@ -1,7 +1,7 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { Forms } = require('@database');
 
-async function erase(interaction, currentForm) {
+async function eraseCommand(interaction, currentForm) {
 	const confirm = new ButtonBuilder()
 		.setCustomId('erase')
 		.setLabel('Erase Form')
@@ -39,4 +39,4 @@ async function erase(interaction, currentForm) {
 	}
 }
 
-module.exports = { erase };
+module.exports = { eraseCommand };

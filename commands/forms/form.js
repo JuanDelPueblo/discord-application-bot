@@ -1,9 +1,10 @@
 const { channelMention, SlashCommandBuilder } = require('discord.js');
 const { Forms } = require('@database');
-const { setup } = require('./form/setup.js');
-const { edit } = require('./form/edit.js');
-const { erase } = require('./form/erase.js');
-const { submit } = require('./form/submit.js');
+const { setupCommand } = require('./form/setup.js');
+const { editCommand } = require('./form/edit.js');
+const { eraseCommand } = require('./form/erase.js');
+const { submitCommand } = require('./form/submit.js');
+const { exportCommand } = require('./form/export.js');
 
 module.exports = {
 	cooldown: 3,
@@ -51,7 +52,7 @@ module.exports = {
 
 		switch (subcommand) {
 			case 'submit':
-				await submit(interaction, currentForm);
+				await submitCommand(interaction, currentForm);
 				break;
 			case 'setup':
 				if (currentForm) {
@@ -59,17 +60,17 @@ module.exports = {
 				} else if (messages.size > 1) {
 					await interaction.reply({ content: 'This channel already has messages! Please start from a empty channel.', ephemeral: true});
 				} else {
-					await setup(interaction);
+					await setupCommand(interaction);
 				}
 				break;
 			case 'export':
-				await interaction.reply('Export!');
+				await exportCommand(interaction, currentForm);
 				break;
 			case 'erase':
-				await erase(interaction, currentForm)
+				await eraseCommand(interaction, currentForm)
 				break;
 			case 'edit':
-				await edit(interaction, currentForm);
+				await editCommand(interaction, currentForm);
 				break;
 			case 'list':
 				const forms = await Forms.findAll();
