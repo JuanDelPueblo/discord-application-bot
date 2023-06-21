@@ -19,16 +19,16 @@ async function editCommand(interaction, currentForm) {
 				description: formDescription,
 				button_text: formButtonText,
 				embed_message_id: currentForm.embed_message_id,
-			}
+			};
 
 			Forms.update(formData, { where: { form_channel_id: interaction.channel.id } });
 
 			const embed = embedForm(interaction, formData);
 			interaction.channel.messages.fetch(currentForm.embed_message_id)
 				.then(message => {
-					message.edit(embed)
-					modalInteraction.reply({ content: 'Form successfully edited!', ephemeral: true});
-				});	
+					message.edit(embed);
+					modalInteraction.reply({ content: 'Form successfully edited!', ephemeral: true });
+				});
 		})
 		.catch((err) => {
 			console.log(err);
@@ -36,4 +36,4 @@ async function editCommand(interaction, currentForm) {
 		});
 }
 
-module.exports = { editCommand }
+module.exports = { editCommand };

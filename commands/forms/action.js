@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
+const { Forms, Actions } = require('@database');
 
 module.exports = {
 	cooldown: 3,
@@ -7,7 +8,7 @@ module.exports = {
 		.setDescription('Configures the actions for the current form')
 		.addSubcommand(subcommand =>
 			subcommand.setName('list')
-				.setDescription('Lists the actions for the current form')
+				.setDescription('Lists the actions for the current form'),
 		)
 		.addSubcommand(subcommand =>
 			subcommand.setName('add')
@@ -15,7 +16,7 @@ module.exports = {
 				.addStringOption(option =>
 					option.setName('name')
 						.setDescription('Name to identify the action with')
-						.setRequired(true)
+						.setRequired(true),
 				)
 				.addStringOption(option =>
 					option.setName('when')
@@ -23,8 +24,8 @@ module.exports = {
 						.setRequired(true)
 						.addChoices(
 							{ name: 'Approved', value: 'approved' },
-							{ name: 'Rejected', value: 'rejected' }
-						)
+							{ name: 'Rejected', value: 'rejected' },
+						),
 				)
 				.addStringOption(option =>
 					option.setName('do')
@@ -38,9 +39,9 @@ module.exports = {
 							{ name: 'Send message to channel', value: 'sendmessage' },
 							{ name: 'Send message to user in DM', value: 'sendmessagedm' },
 							{ name: 'Archive application', value: 'archive' },
-							{ name: 'Delete application', value: 'delete' }
-						)
-				)
+							{ name: 'Delete application', value: 'delete' },
+						),
+				),
 		)
 		.addSubcommand(subcommand =>
 			subcommand.setName('remove')
@@ -48,24 +49,45 @@ module.exports = {
 				.addStringOption(option =>
 					option.setName('name')
 						.setDescription('Name that identifies the action')
-						.setRequired(true)
-				)
+						.setRequired(true),
+				),
 		),
 	async execute(interaction) {
 		const subcommand = interaction.options.getSubcommand();
+		const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+
+		if (!currentForm) {
+			await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true });
+			return;
+		}
+
 		switch (subcommand) {
-		case 'list':
-			await interaction.reply('List!');
+		case 'list': {
+			// TODO: add pagination and embeds
+			const actions = await Actions.findAll({ where: { form_id: currentForm.id } });
+			if (actions.length === 0) {
+				await interaction.reply({ content: 'There are no actions configured for this form!', ephemeral: true });
+			} else {
+				let message = 'The following actions are configured for this form:\n';
+				for (const action of actions) {
+					message += `${action.name} - ${action.when} - ${action.do}\n`;
+				}
+				await interaction.reply(message);
+			}
 			break;
-		case 'add':
+		}
+		case 'add': {
 			await interaction.reply('Add!');
 			break;
-		case 'remove':
+		}
+		case 'remove': {
 			await interaction.reply('Remove!');
 			break;
-		default:
+		}
+		default: {
 			await interaction.reply('Not recognized!');
 			break;
+		}
 		}
 	},
 };

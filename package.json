@@ -40,5 +40,8 @@
     "@utils": "utils",
     "@config": "config.json",
     "@database": "database.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.43.0"
   }
 }

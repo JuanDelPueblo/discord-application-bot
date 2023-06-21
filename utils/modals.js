@@ -11,7 +11,6 @@ module.exports = {
 			.setRequired(true)
 			.setLabel('Form Title')
 			.setStyle(TextInputStyle.Short);
-			
 
 		const formDescriptionInput = new TextInputBuilder()
 			.setCustomId(`form_description-${interaction.channel.id}`)
@@ -37,6 +36,6 @@ module.exports = {
 
 		modal.addComponents(titleRow, descriptionRow, buttonTextRow);
 
-		return interaction.showModal(modal)
+		return interaction.showModal(modal);
 	},
 };

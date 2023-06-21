@@ -1,4 +1,4 @@
-require('module-alias/register')
+require('module-alias/register');
 const fs = require('fs');
 const path = require('path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
@@ -15,9 +15,9 @@ function main() {
 	let commandFolders = fs.readdirSync(foldersPath);
 
 	commandFolders = commandFolders.filter((folder) => {
-        const folderPath = path.resolve(foldersPath, folder);
-        return fs.lstatSync(folderPath).isDirectory();
-    });
+		const folderPath = path.resolve(foldersPath, folder);
+		return fs.lstatSync(folderPath).isDirectory();
+	});
 
 	for (const folder of commandFolders) {
 		const commandsPath = path.join(foldersPath, folder);
@@ -52,7 +52,7 @@ function main() {
 configInit(path.resolve(__dirname)).then(configSuccess => {
 	if (configSuccess) {
 		console.log('Config initialized');
-		main()
+		main();
 	}
 }).catch(error => {
 	console.error('An error occurred while initializing the config:', error);

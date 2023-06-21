@@ -1,4 +1,4 @@
-const {  ApplicationCommandOptionType, EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { ApplicationCommandOptionType, EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const config = require('@config');
 
 module.exports = {
@@ -41,7 +41,7 @@ module.exports = {
 				});
 			}
 		});
-		
+
 		// send the embed
 		await interaction.reply({ embeds: [embed] });
 	},

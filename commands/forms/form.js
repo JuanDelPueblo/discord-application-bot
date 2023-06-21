@@ -17,28 +17,28 @@ module.exports = {
 				.addBooleanOption(option =>
 					option.setName('state')
 						.setDescription('The state to set')
-						.setRequired(true)
-				)
+						.setRequired(true),
+				),
 		)
 		.addSubcommand(subcommand =>
 			subcommand.setName('setup')
-				.setDescription('Begins the process of creating a new form')
+				.setDescription('Begins the process of creating a new form'),
 		)
 		.addSubcommand(subcommand =>
 			subcommand.setName('export')
-				.setDescription('Exports all applications in the current form in a .csv file')
+				.setDescription('Exports all applications in the current form in a .csv file'),
 		)
 		.addSubcommand(subcommand =>
 			subcommand.setName('erase')
-				.setDescription('Erases all applications in the current form')
+				.setDescription('Erases all applications in the current form'),
 		)
 		.addSubcommand(subcommand =>
 			subcommand.setName('edit')
-				.setDescription('Edit the application prompt')
+				.setDescription('Edit the application prompt'),
 		)
 		.addSubcommand(subcommand =>
 			subcommand.setName('list')
-				.setDescription('Lists all forms and their respective channels')
+				.setDescription('Lists all forms and their respective channels'),
 		),
 	async execute(interaction) {
 		const subcommand = await interaction.options.getSubcommand();
@@ -46,44 +46,51 @@ module.exports = {
 		const messages = await interaction.channel.messages.fetch();
 
 		if (!currentForm && !['list', 'setup'].includes(subcommand)) {
-			await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true});
+			await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true });
 			return;
 		}
 
 		switch (subcommand) {
-			case 'submit':
-				await submitCommand(interaction, currentForm);
-				break;
-			case 'setup':
-				if (currentForm) {
-					await interaction.reply({ content: 'This channel is already a form channel!', ephemeral: true});
-				} else if (messages.size > 1) {
-					await interaction.reply({ content: 'This channel already has messages! Please start from a empty channel.', ephemeral: true});
-				} else {
-					await setupCommand(interaction);
-				}
-				break;
-			case 'export':
-				await exportCommand(interaction, currentForm);
-				break;
-			case 'erase':
-				await eraseCommand(interaction, currentForm)
-				break;
-			case 'edit':
-				await editCommand(interaction, currentForm);
-				break;
-			case 'list':
-				const forms = await Forms.findAll();
-				if (forms.length === 0) {
-					await interaction.reply({ content: 'No forms found!', ephemeral: true});
-				} else {
-					const formsList = forms.map(form => `${channelMention(form.form_channel_id)} - ${form.title}`);
-					await interaction.reply({ content: formsList.join('\n'), ephemeral: true});
-				}
-				break;
-			default:
-				await interaction.reply({ content: 'Not recognized!', ephemeral: true});
-				break;
+		case 'submit': {
+			await submitCommand(interaction, currentForm);
+			break;
 		}
-	}
+		case 'setup': {
+			if (currentForm) {
+				await interaction.reply({ content: 'This channel is already a form channel!', ephemeral: true });
+			} else if (messages.size > 1) {
+				await interaction.reply({ content: 'This channel already has messages! Please start from a empty channel.', ephemeral: true });
+			} else {
+				await setupCommand(interaction);
+			}
+			break;
+		}
+		case 'export': {
+			await exportCommand(interaction, currentForm);
+			break;
+		}
+		case 'erase': {
+			await eraseCommand(interaction, currentForm);
+			break;
+		}
+		case 'edit': {
+			await editCommand(interaction, currentForm);
+			break;
+		}
+		case 'list': {
+			const forms = await Forms.findAll();
+			if (forms.length === 0) {
+				await interaction.reply({ content: 'No forms found!', ephemeral: true });
+			} else {
+				const formsList = forms.map(form => `${channelMention(form.form_channel_id)} - ${form.title}`);
+				await interaction.reply({ content: formsList.join('\n'), ephemeral: true });
+			}
+			break;
+		}
+		default: {
+			await interaction.reply({ content: 'Not recognized!', ephemeral: true });
+			break;
+		}
+		}
+	},
 };

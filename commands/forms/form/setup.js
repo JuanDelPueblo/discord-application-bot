@@ -18,7 +18,7 @@ async function setupCommand(interaction) {
 				title: formTitle,
 				description: formDescription,
 				button_text: formButtonText,
-			}
+			};
 
 			Forms.create(formData, { where: { form_channel_id: interaction.channel.id } });
 
@@ -35,4 +35,4 @@ async function setupCommand(interaction) {
 		});
 }
 
-module.exports = { setupCommand }
+module.exports = { setupCommand };

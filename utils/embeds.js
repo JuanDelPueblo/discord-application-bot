@@ -17,5 +17,5 @@ module.exports = {
 			.addComponents(formButton);
 
 		return { embeds: [embed], components: [buttonRow] };
-	}
-}
+	},
+};

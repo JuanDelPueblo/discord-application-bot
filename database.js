@@ -20,8 +20,8 @@ Forms.hasMany(Roles, { foreignKey: 'form_channel_id', as: 'roles', onDelete: 'CA
 Forms.hasMany(Applications, { foreignKey: 'form_channel_id', as: 'applications', onDelete: 'CASCADE' });
 Applications.hasMany(Answers, { foreignKey: 'thread_id', as: 'answers', onDelete: 'CASCADE' });
 Answers.belongsTo(Questions, { foreignKey: 'question_id', as: 'question' });
-Questions.addHook('beforeDestroy', (question, options) => {
-  return Answers.destroy({ where: { question_id: question.question_id } });
+Questions.addHook('beforeDestroy', (question) => {
+	return Answers.destroy({ where: { question_id: question.question_id } });
 });
 
 module.exports = { Forms, Actions, Roles, Questions, Applications, Answers };

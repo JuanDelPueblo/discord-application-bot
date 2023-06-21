@@ -16,9 +16,9 @@ async function eraseCommand(interaction, currentForm) {
 		.addComponents(cancel, confirm);
 
 	const response = await interaction.reply({
-		content: `Are you sure you want to erase this form and all applications related to it?`,
+		content: 'Are you sure you want to erase this form and all applications related to it?',
 		components: [row],
-		ephemeral: true
+		ephemeral: true,
 	});
 
 	const filter = i => i.user.id === interaction.user.id;
@@ -29,7 +29,7 @@ async function eraseCommand(interaction, currentForm) {
 		if (confirmation.customId === 'erase') {
 			await interaction.channel.messages.fetch(currentForm.embed_message_id).then(msg => msg.delete());
 			await Forms.destroy({ where: { form_channel_id: interaction.channel.id } });
-			await confirmation.update({ content: `Form has been successfully erased!`, components: [] });
+			await confirmation.update({ content: 'Form has been successfully erased!', components: [] });
 		} else if (confirmation.customId === 'cancel') {
 			await confirmation.update({ content: 'Form erase cancelled', components: [] });
 		}
