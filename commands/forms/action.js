@@ -1,5 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { Forms, Actions } = require('@database');
+const { Forms } = require('@database');
+const { listCommand } = require('./action/list.js');
+const { addCommand } = require('./action/add.js');
+const { removeCommand } = require('./action/remove.js');
 
 module.exports = {
 	cooldown: 3,
@@ -38,7 +41,6 @@ module.exports = {
 							{ name: 'Kick', value: 'kick' },
 							{ name: 'Send message to channel', value: 'sendmessage' },
 							{ name: 'Send message to user in DM', value: 'sendmessagedm' },
-							{ name: 'Archive application', value: 'archive' },
 							{ name: 'Delete application', value: 'delete' },
 						),
 				),
@@ -63,25 +65,15 @@ module.exports = {
 
 		switch (subcommand) {
 		case 'list': {
-			// TODO: add pagination and embeds
-			const actions = await Actions.findAll({ where: { form_id: currentForm.id } });
-			if (actions.length === 0) {
-				await interaction.reply({ content: 'There are no actions configured for this form!', ephemeral: true });
-			} else {
-				let message = 'The following actions are configured for this form:\n';
-				for (const action of actions) {
-					message += `${action.name} - ${action.when} - ${action.do}\n`;
-				}
-				await interaction.reply(message);
-			}
+			await listCommand(interaction, currentForm);
 			break;
 		}
 		case 'add': {
-			await interaction.reply('Add!');
+			await addCommand(interaction, currentForm);
 			break;
 		}
 		case 'remove': {
-			await interaction.reply('Remove!');
+			await removeCommand(interaction, currentForm);
 			break;
 		}
 		default: {
