@@ -1,5 +1,10 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { Forms, Questions } = require('@database');
+const { Forms } = require('@database');
+const { editCommand } = require('./questions/edit.js');
+const { addCommand } = require('./questions/add.js');
+const { removeCommand } = require('./questions/remove.js');
+const { listCommand } = require('./questions/list.js');
+const { moveCommand } = require('./questions/move.js');
 
 module.exports = {
 	cooldown: 3,
@@ -36,7 +41,7 @@ module.exports = {
 				.addBooleanOption(option =>
 					option.setName('required')
 						.setDescription('Is the question required')
-						.setRequired(true),
+						.setRequired(false),
 				)
 				.addIntegerOption(option =>
 					option.setName('min')
@@ -83,23 +88,23 @@ module.exports = {
 
 		switch (subcommand) {
 		case 'edit': {
-			await interaction.reply('Edit!');
+			await editCommand(interaction, currentForm);
 			break;
 		}
 		case 'list': {
-			await interaction.reply('List!');
+			await listCommand(interaction, currentForm);
 			break;
 		}
 		case 'add': {
-			await interaction.reply('Add!');
+			await addCommand(interaction, currentForm);
 			break;
 		}
 		case 'remove': {
-			await interaction.reply('Remove!');
+			await removeCommand(interaction, currentForm);
 			break;
 		}
 		case 'move': {
-			await interaction.reply('Move!');
+			await moveCommand(interaction, currentForm);
 			break;
 		}
 		default: {

@@ -31,11 +31,11 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		min: { // minimum characters of text, lowest number allowed, minimum number of options, minimum number of files
 			type: DataTypes.INTEGER,
-			allowNull: true,
+			allowNull: false,
 		},
 		max: { // maximum characters of text, highest number allowed, maximum number of options, maximum number of files
 			type: DataTypes.INTEGER,
-			allowNull: true,
+			allowNull: false,
 		},
 		options: { // options for a select question
 			type: DataTypes.JSON,

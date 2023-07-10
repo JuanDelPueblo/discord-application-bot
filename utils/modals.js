@@ -38,4 +38,31 @@ module.exports = {
 
 		return interaction.showModal(modal);
 	},
+	editQuestionModal(interaction) {
+		const modal = new ModalBuilder()
+			.setCustomId(`edit_question-${interaction.channel.id}`)
+			.setTitle('Edit Question');
+
+		const questionTitleInput = new TextInputBuilder()
+			.setCustomId(`question_title-${interaction.channel.id}`)
+			.setRequired(true)
+			.setLabel('Question Title')
+			.setStyle(TextInputStyle.Short);
+
+		const questionDescriptionInput = new TextInputBuilder()
+			.setCustomId(`question_description-${interaction.channel.id}`)
+			.setRequired(false)
+			.setLabel('Question Description')
+			.setStyle(TextInputStyle.Paragraph);
+
+		const titleRow = new ActionRowBuilder()
+			.addComponents(questionTitleInput);
+
+		const descriptionRow = new ActionRowBuilder()
+			.addComponents(questionDescriptionInput);
+
+		modal.addComponents(titleRow, descriptionRow);
+
+		return interaction.showModal(modal);
+	},
 };
