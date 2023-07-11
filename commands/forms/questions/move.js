@@ -5,18 +5,23 @@ async function moveCommand(interaction, currentForm) {
 	const position = interaction.options.getInteger('position');
 
 	const question = await Questions.findOne({ where: { form_channel_id: currentForm.form_channel_id, question_id: id } });
-	if (!question) {
-		await interaction.reply({ content: 'There is no question with that ID configured for this form!', ephemeral: true });
+	const questionAtPosition = await Questions.findOne({ where: { form_channel_id: currentForm.form_channel_id, order: position } });
+	if (!question || !questionAtPosition) {
+		await interaction.reply({ content: 'There is no question with that ID or position configured for this form!', ephemeral: true });
 		return;
 	}
 
 	await interaction.deferReply({ ephemeral: true });
 	try {
-		await question.update({
-			position: position,
+		await questionAtPosition.update({
+			order: question.order,
 		});
 
-		await interaction.followUp({ content: 'The question has been moved to position ${position}!', ephemeral: true });
+		await question.update({
+			order: position,
+		});
+
+		await interaction.followUp({ content: `The question has been moved to position ${position}!`, ephemeral: true });
 	} catch (error) {
 		console.error(error);
 		await interaction.followUp({ content: 'There was an error moving the question!', ephemeral: true });

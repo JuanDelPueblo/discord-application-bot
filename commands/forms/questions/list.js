@@ -1,7 +1,7 @@
 const { Questions } = require('@database');
 
 async function listCommand(interaction, currentForm) {
-	const questions = await Questions.findAll({ where: { form_channel_id: currentForm.form_channel_id } });
+	const questions = await Questions.findAll({ where: { form_channel_id: currentForm.form_channel_id }, order: ['order'] });
 	if (!questions) {
 		await interaction.reply({ content: 'There are no questions configured for this form!', ephemeral: true });
 		return;
