@@ -69,6 +69,10 @@ async function editCommand(interaction, currentForm) {
 					}
 				}
 
+				if (options.length < 2) {
+					return modalInteraction.followUp({ content: 'You must have at least 2 options!', ephemeral: true });
+				}
+
 				await Questions.update({
 					form_channel_id: currentForm.form_channel_id,
 					question_id: id,

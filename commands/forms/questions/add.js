@@ -71,6 +71,10 @@ async function addCommand(interaction, currentForm) {
 					}
 				}
 
+				if (options.length < 2) {
+					return modalInteraction.followUp({ content: 'You must have at least 2 options!', ephemeral: true });
+				}
+
 				await Questions.create({
 					form_channel_id: currentForm.form_channel_id,
 					type: type,
