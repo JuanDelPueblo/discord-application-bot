@@ -14,7 +14,7 @@ async function editCommand(interaction, currentForm) {
 	const modalFilter = i => i.customId.startsWith(`edit_question-${interaction.channel.id}`);
 	const modalInteraction = await interaction.awaitModalSubmit({ time: 43_200_000, modalFilter })
 		.catch(() => {
-			interaction.followUp({ content: 'Question creation cancelled or something went wrong!', ephemeral: true });
+			interaction.followUp({ content: 'Question update cancelled or something went wrong!', ephemeral: true });
 		});
 
 	if (!modalInteraction) return;
@@ -36,7 +36,7 @@ async function editCommand(interaction, currentForm) {
 				description: questionDescription,
 			});
 
-			await modalInteraction.reply({ content: 'The question has been updated!', ephemeral: true });
+			await modalInteraction.reply({ content: 'This question has been updated!', ephemeral: true });
 
 			break;
 		}
@@ -76,7 +76,7 @@ async function editCommand(interaction, currentForm) {
 					description: questionDescription,
 					options: options,
 				});
-				await modalInteraction.followUp({ content: 'The question has been added to this form!', ephemeral: true });
+				await modalInteraction.followUp({ content: 'This question has been updated!', ephemeral: true });
 				const choices = options.map((option, index) => `${index + 1}. ${option}`).join('\n');
 				await modalInteraction.followUp({ content: `**Choices:**\n${choices}`, ephemeral: true });
 			});
