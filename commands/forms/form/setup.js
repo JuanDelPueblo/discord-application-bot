@@ -1,6 +1,6 @@
 const { Forms } = require('@database');
 const { editFormModal } = require('@utils/modals.js');
-const { embedForm } = require('@utils/embeds.js');
+const { formEmbed } = require('@utils/embeds.js');
 
 async function setupCommand(interaction) {
 	editFormModal(interaction)
@@ -22,7 +22,7 @@ async function setupCommand(interaction) {
 
 			Forms.create(formData, { where: { form_channel_id: interaction.channel.id } });
 
-			const embed = embedForm(interaction, formData);
+			const embed = formEmbed(interaction, formData);
 			interaction.channel.send(embed)
 				.then(message => {
 					Forms.update({ embed_message_id: message.id }, { where: { form_channel_id: interaction.channel.id } });
