@@ -16,8 +16,8 @@ function registerModels(sequelize, rootDir) {
 							model(sequelize, DataTypes);
 						}
 					}
-				});
-			resolve();
+				})
+				.then(() => resolve());
 		} catch (error) {
 			reject(error);
 		}
