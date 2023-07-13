@@ -24,7 +24,7 @@ async function eraseCommand(interaction, currentForm) {
 	const filter = i => i.user.id === interaction.user.id;
 
 	try {
-		const confirmation = await response.awaitMessageComponent({ filter: filter, time: 60000 });
+		const confirmation = await response.awaitMessageComponent({ filter: filter, time: 43_200_000 });
 
 		if (confirmation.customId === 'erase') {
 			await interaction.channel.messages.fetch(currentForm.embed_message_id).then(msg => msg.delete());

@@ -18,7 +18,7 @@ async function addCommand(interaction, currentForm) {
 		case 'removerole':
 		case 'addrole': {
 			await interaction.editReply({ content: `Please mention the role you would like to ${action === 'addrole' ? 'add' : 'remove'} with this action`, ephemeral: true });
-			const response = await interaction.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ['time'] })
+			const response = await interaction.channel.awaitMessages({ filter, max: 1, time: 43_200_000, errors: ['time'] })
 				.catch(() => {
 					interaction.followUp({ content: 'No roles mentioned in time.', ephemeral: true });
 				});
@@ -46,7 +46,7 @@ async function addCommand(interaction, currentForm) {
 		case 'ban':
 		case 'kick': {
 			await interaction.editReply({ content: `Please enter the reason for the ${action} with this action`, ephemeral: true });
-			const response = await interaction.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ['time'] })
+			const response = await interaction.channel.awaitMessages({ filter, max: 1, time: 43_200_000, errors: ['time'] })
 				.catch(() => {
 					interaction.followUp({ content: 'No reason given in time.', ephemeral: true });
 				});
@@ -68,7 +68,7 @@ async function addCommand(interaction, currentForm) {
 		}
 		case 'sendmessage': {
 			await interaction.editReply({ content: 'Please mention the channel you would like to send the message to with this action', ephemeral: true });
-			const firstResponse = await interaction.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ['time'] })
+			const firstResponse = await interaction.channel.awaitMessages({ filter, max: 1, time: 43_200_000, errors: ['time'] })
 				.catch(() => {
 					interaction.followUp({ content: 'No channel mentioned in time.', ephemeral: true });
 				});
@@ -82,7 +82,7 @@ async function addCommand(interaction, currentForm) {
 			}
 
 			await interaction.followUp({ content: 'Please enter the message you would like to send with this action', ephemeral: true });
-			const secondResponse = await interaction.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ['time'] })
+			const secondResponse = await interaction.channel.awaitMessages({ filter, max: 1, time: 43_200_000, errors: ['time'] })
 				.catch(() => {
 					interaction.followUp({ content: 'No message given in time.', ephemeral: true });
 				});
@@ -104,7 +104,7 @@ async function addCommand(interaction, currentForm) {
 		}
 		case 'sendmessagedm': {
 			await interaction.editReply({ content: 'Please enter the message you would like to send with this action', ephemeral: true });
-			const response = await interaction.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ['time'] })
+			const response = await interaction.channel.awaitMessages({ filter, max: 1, time: 43_200_000, errors: ['time'] })
 				.catch(() => {
 					interaction.followUp({ content: 'No message given in time.', ephemeral: true });
 				});
