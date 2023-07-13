@@ -95,7 +95,7 @@ async function addCommand(interaction, currentForm) {
 				name: name,
 				when: when,
 				do: action,
-				channel_id: channel.id,
+				message_channel_id: channel.id,
 				message: message,
 			});
 

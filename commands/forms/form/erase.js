@@ -1,5 +1,5 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { Forms } = require('@database');
+const { Forms, Questions, Actions, Roles, Applications, Answers } = require('@database');
 
 async function eraseCommand(interaction, currentForm) {
 	const confirm = new ButtonBuilder()
@@ -28,7 +28,17 @@ async function eraseCommand(interaction, currentForm) {
 
 		if (confirmation.customId === 'erase') {
 			await interaction.channel.messages.fetch(currentForm.embed_message_id).then(msg => msg.delete());
-			await Forms.destroy({ where: { form_channel_id: interaction.channel.id } });
+			const form = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+			const questions = await Questions.findAll({
+				where: { form_channel_id: form.form_channel_id },
+			});
+			for (const question of questions) {
+				await question.destroy();
+			}
+			await form.destroy();
+			await Actions.destroy({ where: { form_channel_id: form.form_channel_id } });
+			await Roles.destroy({ where: { form_channel_id: form.form_channel_id } });
+			await Applications.destroy({ where: { form_channel_id: form.form_channel_id } });
 			await confirmation.update({ content: 'Form has been successfully erased!', components: [] });
 		} else if (confirmation.customId === 'cancel') {
 			await confirmation.update({ content: 'Form erase cancelled', components: [] });

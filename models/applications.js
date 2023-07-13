@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
 	return sequelize.define('applications', {
-		channel_id: { // channel ID of the form, the identifier of each form
+		form_channel_id: { // channel ID of the form, the identifier of each form
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
