@@ -19,11 +19,11 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		submitted_at: { // date the application was submitted
 			type: DataTypes.DATE,
-			allowNull: false,
+			allowNull: true,
 		},
 		approved: { // whether the application was approved or rejected
 			type: DataTypes.BOOLEAN,
-			allowNull: false,
+			allowNull: true,
 		},
 	}, {
 		sequelize,

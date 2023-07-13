@@ -1,15 +1,22 @@
 const Sequelize = require('sequelize');
 const { DataTypes } = require('sequelize');
+const fs = require('fs');
 const path = require('path');
 
 function registerModels(sequelize, rootDir) {
 	return new Promise((resolve, reject) => {
 		try {
-			for (const file of require('fs').promises.readdir(path.join(rootDir, 'models'))) {
-				if (file.endsWith('.js')) {
-					require(path.join(rootDir, 'models', file))(sequelize, DataTypes);
-				}
-			}
+			const modelsPath = path.resolve(rootDir, 'models');
+			fs.promises.readdir(modelsPath)
+				.then((files) => {
+					for (const file of files) {
+						if (file.endsWith('.js')) {
+							const filePath = path.resolve(modelsPath, file);
+							const model = require(filePath);
+							model(sequelize, DataTypes);
+						}
+					}
+				});
 			resolve();
 		} catch (error) {
 			reject(error);
@@ -27,14 +34,14 @@ module.exports = (rootDir) => {
 				logging: false,
 			});
 
-			registerModels(sequelize, rootDir);
-
-			sequelize.sync();
-
-			console.log('Database synced');
-			sequelize.close();
-
-			resolve();
+			registerModels(sequelize, rootDir)
+				.then(() => {
+					return sequelize.sync();
+				}).then(() => {
+					console.log('Database synced');
+					sequelize.close();
+					resolve();
+				});
 		} catch (error) {
 			console.error('An error occurred while initializing the database:', error);
 			reject(error);
