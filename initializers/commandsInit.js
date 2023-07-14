@@ -7,32 +7,33 @@ function loadCommands(rootDir) {
 		try {
 			const commands = [];
 			const foldersPath = path.resolve(rootDir, 'commands');
-			let commandFolders = fs.promises.readdir(foldersPath);
+			fs.promises.readdir(foldersPath)
+				.then((folders) => {
+					const commandFolders = folders.filter((folder) => {
+						const folderPath = path.resolve(foldersPath, folder);
+						return fs.lstatSync(folderPath).isDirectory();
+					});
 
-			commandFolders = commandFolders.filter((folder) => {
-				const folderPath = path.resolve(foldersPath, folder);
-				return fs.lstatSync(folderPath).isDirectory();
-			});
+					for (const folder of commandFolders) {
+						const commandsPath = path.resolve(foldersPath, folder);
+						fs.promises.readdir(commandsPath)
+							.then((files) => {
+								for (const file of files) {
+									if (file.endsWith('.js')) {
+										const filePath = path.resolve(commandsPath, file);
+										const command = require(filePath);
 
-			for (const folder of commandFolders) {
-				const commandsPath = path.resolve(foldersPath, folder);
-				const commandFiles = fs.promises.readdir(commandsPath);
-
-				for (const file of commandFiles) {
-					if (file.endsWith('.js')) {
-						const filePath = path.resolve(commandsPath, file);
-						const command = require(filePath);
-
-						if (command.data && command.execute) {
-							commands.push(command.data.toJSON());
-						} else {
-							console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-						}
+										if (command.data && command.execute) {
+											commands.push(command.data.toJSON());
+										} else {
+											console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+										}
+									}
+								}
+								resolve(commands);
+							});
 					}
-				}
-			}
-
-			resolve(commands);
+				});
 		} catch (error) {
 			reject(error);
 		}
@@ -42,15 +43,19 @@ function loadCommands(rootDir) {
 module.exports = (rootDir, clientId, token) => {
 	return new Promise((resolve, reject) => {
 		try {
-			const commands = loadCommands(rootDir);
-			const rest = new REST().setToken(token);
+			loadCommands(rootDir)
+				.then((commands) => {
+					const rest = new REST().setToken(token);
 
-			console.log(`Started refreshing ${commands.length} application (/) commands.`);
+					console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-			const data = rest.put(Routes.applicationCommands(clientId), { body: commands });
+					return rest.put(Routes.applicationCommands(clientId), { body: commands });
+				})
+				.then(data => {
+					console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+					resolve(data);
+				});
 
-			console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-			resolve(data);
 		} catch (error) {
 			console.error('An error occurred while initializing the commands:', error);
 			reject(error);
