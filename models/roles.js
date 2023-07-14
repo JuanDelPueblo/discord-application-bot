@@ -8,20 +8,10 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.JSON,
 			allowNull: false,
 		},
-		can_view: { // whether the role can view the form
+		permission: { // permission to give to the role
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
-			defaultValue: false,
-		},
-		can_take_action: { // whether the role can approve or reject applications
-			type: DataTypes.BOOLEAN,
-			allowNull: false,
-			defaultValue: false,
-		},
-		can_edit: { // whether the role can edit the form
-			type: DataTypes.BOOLEAN,
-			allowNull: false,
-			defaultValue: false,
+			defaultValue: 'none',
 		},
 	}, {
 		sequelize,

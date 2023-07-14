@@ -19,20 +19,15 @@ module.exports = {
 						.setDescription('The role to set permissions for')
 						.setRequired(true),
 				)
-				.addBooleanOption(option =>
-					option.setName('view')
-						.setDescription('Whether the role can view forms')
-						.setRequired(false),
-				)
-				.addBooleanOption(option =>
-					option.setName('action')
-						.setDescription('Whether the role can act on forms')
-						.setRequired(false),
-				)
-				.addBooleanOption(option =>
-					option.setName('edit')
-						.setDescription('Whether the role can edit forms')
-						.setRequired(false),
+				.addStringOption(option =>
+					option.setName('permission')
+						.setDescription('The permission to set')
+						.setRequired(true)
+						.addChoices(
+							{ name: 'View applications only', value: 'view' },
+							{ name: 'View and take action on applications', value: 'action' },
+							{ name: 'View, take action, and edit the form', value: 'edit' },
+						),
 				),
 		)
 		.addSubcommand(subcommand =>
@@ -64,9 +59,13 @@ module.exports = {
 					.setColor(color);
 				roles.forEach(role => {
 					const roleObj = interaction.guild.roles.cache.get(role.role_id);
+					let rolePermissions = 'No permissions set for this role';
+					if (role.permission === 'view') rolePermissions = 'Can view applications';
+					if (role.permission === 'action') rolePermissions = 'Can view and take action on applications';
+					if (role.permission === 'edit') rolePermissions = 'Can view, take action, and edit the form';
 					embed.addFields({
 						name: `${roleObj.name}`,
-						value: `Can view: ${role.can_view}\nCan take action: ${role.can_take_action}\nCan edit: ${role.can_edit}`,
+						value: rolePermissions,
 					});
 				});
 				await interaction.reply({ embeds: [embed], ephemeral: true });
@@ -75,16 +74,11 @@ module.exports = {
 		}
 		case 'set': {
 			const role = await interaction.options.getRole('role');
-			const view = await interaction.options.getBoolean('view');
-			const action = await interaction.options.getBoolean('action');
-			const edit = await interaction.options.getBoolean('edit');
-			// null check
+			const permission = await interaction.options.getString('permission');
 			Roles.upsert({
 				form_channel_id: currentForm.form_channel_id,
 				role_id: role.id,
-				can_view: view ? view : false,
-				can_take_action: action ? action : false,
-				can_edit: edit ? edit : false,
+				permission: permission,
 			})
 				.then(() => interaction.reply({ content: `Set permissions for <@&${role.id}>`, ephemeral: true }))
 				.catch((err) => {
