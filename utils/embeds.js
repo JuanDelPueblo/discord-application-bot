@@ -5,12 +5,13 @@ module.exports = {
 	formEmbed(interaction, formData) {
 		const embed = new EmbedBuilder()
 			.setColor(color)
-			.setTitle(formData.title)
-			.setDescription(formData.description);
+			.setTitle(formData.title);
+
+		if (formData.description) embed.setDescription(formData.description);
 
 		const formButton = new ButtonBuilder()
 			.setCustomId(`form-${interaction.channel.id}`)
-			.setLabel(formData.button_text)
+			.setLabel(formData.button_text || 'New Application')
 			.setStyle(ButtonStyle.Primary);
 
 		const buttonRow = new ActionRowBuilder()

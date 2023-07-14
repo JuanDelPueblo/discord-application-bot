@@ -14,13 +14,13 @@ module.exports = {
 
 		const formDescriptionInput = new TextInputBuilder()
 			.setCustomId(`form_description-${interaction.channel.id}`)
-			.setRequired(true)
+			.setRequired(false)
 			.setLabel('Form Description')
 			.setStyle(TextInputStyle.Paragraph);
 
 		const formButtonTextInput = new TextInputBuilder()
 			.setCustomId(`form_button_text-${interaction.channel.id}`)
-			.setRequired(true)
+			.setRequired(false)
 			.setLabel('Form Button Text')
 			.setPlaceholder('New Application')
 			.setStyle(TextInputStyle.Short);
