@@ -30,7 +30,18 @@ module.exports = {
 		const unit = type === 'Text' ? 'characters' : type === 'Number' ? 'value' : 'attachments';
 		if (question.min) embed.addFields({ name: `Minimum ${unit}`, value: `${question.min}`, inline: true });
 		if (question.max) embed.addFields({ name: `Maximum ${unit}`, value: `${question.max}`, inline: true });
-		return { embeds: [embed] };
+
+		if (question.required)	return { embeds: [embed] };
+
+		const skipButton = new ButtonBuilder()
+			.setCustomId(`skip-${thread.id}-${question.question_id}`)
+			.setLabel('Skip')
+			.setStyle(ButtonStyle.Secondary);
+
+		const row = new ActionRowBuilder()
+			.addComponents(skipButton);
+
+		return { embeds: [embed], components: [row] };
 	},
 	selectQuestionEmbed(thread, question) {
 		const embed = new EmbedBuilder()
@@ -47,10 +58,20 @@ module.exports = {
 				.setLabel(option)
 				.setValue(option)));
 
+		const skipButton = new ButtonBuilder()
+			.setCustomId(`skip-${thread.id}-${question.question_id}`)
+			.setLabel('Skip')
+			.setStyle(ButtonStyle.Secondary);
+
 		const row = new ActionRowBuilder()
 			.addComponents(selectMenu);
 
-		return { embeds: [embed], components: [row] };
+		const row2 = new ActionRowBuilder()
+			.addComponents(skipButton);
+
+		if (question.required) return { embeds: [embed], components: [row] };
+
+		return { embeds: [embed], components: [row, row2] };
 	},
 	formSubmittedEmbed(thread) {
 		const embed = new EmbedBuilder()
