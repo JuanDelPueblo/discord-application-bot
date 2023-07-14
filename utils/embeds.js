@@ -19,11 +19,16 @@ module.exports = {
 		return { embeds: [embed], components: [buttonRow] };
 	},
 	questionEmbed(thread, question) {
+		let type = question.type.charAt(0).toUpperCase() + question.type.slice(1);
+		if (type === 'Fileupload') type = 'File Upload';
 		const embed = new EmbedBuilder()
 			.setColor(color)
-			.setTitle(`Question #${question.order}: ${question.title}`);
+			.setTitle(`Question #${question.order}: ${question.title}`)
+			.addFields({ name: 'Question Type', value: type, inline: true });
 		if (question.description) embed.setDescription(question.description);
-		if (question.min && question.max) embed.setFooter({ text: `Min: ${question.min} | Max: ${question.max}` });
+		const unit = type === 'Text' ? 'characters' : type === 'Number' ? 'value' : 'attachments';
+		if (question.min) embed.addFields({ name: `Minimum ${unit}`, value: `${question.min}`, inline: true });
+		if (question.max) embed.addFields({ name: `Maximum ${unit}`, value: `${question.max}`, inline: true });
 		return { embeds: [embed] };
 	},
 	selectQuestionEmbed(thread, question) {

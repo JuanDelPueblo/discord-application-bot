@@ -5,15 +5,18 @@ async function textQuestionCollector(interaction, thread, question) {
 		const embed = questionEmbed(thread, question);
 		thread.send(embed);
 
+		const min = question.min ?? 1;
+		const max = question.max ?? 2000;
+
 		const filter = m => {
-			return m.author.id === interaction.user.id && (m.content.length >= question.min && m.content.length <= question.max);
+			return m.author.id === interaction.user.id && (m.content.length >= min && m.content.length <= max);
 		};
 
 		const collector = thread.createMessageCollector({ filter, max: 1, time: 43_200_000 });
 
 		collector.on('ignore', async m => {
-			if ((m.content.length < question.min || m.content.length > question.max) && m.author.id === interaction.user.id) {
-				await thread.send({ content: `Your response must be between ${question.min} and ${question.max} characters long. Please answer again.`, ephemeral: true });
+			if ((m.content.length < min || m.content.length > max) && m.author.id === interaction.user.id) {
+				await thread.send({ content: `Your response must be between ${min} and ${max} characters long. Please answer again.`, ephemeral: true });
 			}
 		});
 
@@ -38,17 +41,25 @@ async function numberQuestionCollector(interaction, thread, question) {
 
 		const filter = m => {
 			const value = parseInt(m.content);
-			return m.author.id === interaction.user.id && (value >= question.min && value <= question.max);
+			return m.author.id === interaction.user.id && ((question.min ? (value >= question.min) : true) && (question.max ? (value <= question.max) : true));
 		};
 
 		const collector = thread.createMessageCollector({ filter, max: 1, time: 43_200_000 });
 
 		collector.on('ignore', async m => {
 			const value = parseInt(m.content);
-			if ((value < question.min || value > question.max) && m.author.id === interaction.user.id) {
-				await thread.send({ content: `Your response must be between ${question.min} and ${question.max}. Please answer again.`, ephemeral: true });
-			} else if (isNaN(value) && m.author.id === interaction.user.id) {
-				await thread.send({ content: 'Your response must be a number. Please answer again.', ephemeral: true });
+			if (m.author.id === interaction.user.id) {
+				if (isNaN(value)) {
+					await thread.send({ content: 'Your response must be a number. Please answer again.', ephemeral: true });
+				} else if (question.min && question.max) {
+					if (value < question.min || value > question.max) {
+						await thread.send({ content: `Your response must be between ${question.min} and ${question.max}. Please answer again.`, ephemeral: true });
+					}
+				} else if (question.min && value < question.min) {
+					await thread.send({ content: `Your response must be greater than ${question.min}. Please answer again.`, ephemeral: true });
+				} else if (question.max && value > question.max) {
+					await thread.send({ content: `Your response must be less than ${question.max}. Please answer again.`, ephemeral: true });
+				}
 			}
 		});
 
@@ -90,8 +101,11 @@ async function fileUploadQuestionCollector(interaction, thread, question) {
 		const embed = questionEmbed(thread, question);
 		thread.send(embed);
 
+		const min = question.min ?? 1;
+		const max = question.max ?? 10;
+
 		const filter = m => {
-			return m.author.id === interaction.user.id && m.attachments.size >= question.min && m.attachments.size <= question.max;
+			return m.author.id === interaction.user.id && m.attachments.size >= min && m.attachments.size <= max;
 		};
 
 		const collector = thread.createMessageCollector({ filter, max: 1, time: 43_200_000 });
@@ -99,8 +113,8 @@ async function fileUploadQuestionCollector(interaction, thread, question) {
 		collector.on('ignore', async m => {
 			if (m.attachments.size === 0 && m.author.id === interaction.user.id) {
 				await thread.send({ content: 'Your response must include an attachment. Please answer again.', ephemeral: true });
-			} else if ((m.attachments.size < question.min || m.attachments.size > question.max) && m.author.id === interaction.user.id) {
-				await thread.send({ content: `Your response must include between ${question.min} and ${question.max} attachments. Please upload the requested files again.`, ephemeral: true });
+			} else if ((m.attachments.size < min || m.attachments.size > max) && m.author.id === interaction.user.id) {
+				await thread.send({ content: `Your response must include between ${min} and ${max} attachments. Please upload the requested files again.`, ephemeral: true });
 			}
 		});
 

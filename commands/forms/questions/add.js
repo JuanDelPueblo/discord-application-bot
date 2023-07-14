@@ -1,8 +1,7 @@
 const { Questions } = require('@database');
 const { editQuestionModal } = require('@utils/modals.js');
 
-async function addCommand(interaction, currentForm) {
-	const type = interaction.options.getString('type');
+async function addCommand(interaction, currentForm, type) {
 	const required = interaction.options.getBoolean('required') ?? false;
 	let min = interaction.options.getInteger('min');
 	let max = interaction.options.getInteger('max');
@@ -25,14 +24,7 @@ async function addCommand(interaction, currentForm) {
 	try {
 		switch (type) {
 		case 'text': {
-			min = min ?? 1;
-			max = max ?? 2000;
-
-			if (min > max) return interaction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
-
-			if (min > 2000 || min < 1 || max > 2000 || max < 1) {
-				return modalInteraction.reply({ content: 'The minimum or maximum amount of characters cannot be greater than 2000 or less than 1 for this type of question!', ephemeral: true });
-			}
+			if ((min ?? 1) > (max ?? 2000)) return modalInteraction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
 
 			await Questions.create({
 				form_channel_id: currentForm.form_channel_id,
@@ -48,14 +40,7 @@ async function addCommand(interaction, currentForm) {
 			break;
 		}
 		case 'number': {
-			min = min ?? -Number.MAX_VALUE;
-			max = max ?? Number.MAX_VALUE;
-
-			if (min > max) return interaction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
-
-			if (min > Number.MAX_VALUE || min < -Number.MAX_VALUE || max > Number.MAX_VALUE || max < -Number.MAX_VALUE) {
-				return modalInteraction.reply({ content: 'The minimum or maximum number is too big!', ephemeral: true });
-			}
+			if ((min ?? -Number.MAX_VALUE) > (max ?? Number.MAX_VALUE)) return modalInteraction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
 
 			await Questions.create({
 				form_channel_id: currentForm.form_channel_id,
@@ -71,14 +56,7 @@ async function addCommand(interaction, currentForm) {
 			break;
 		}
 		case 'fileupload': {
-			min = min ?? 1;
-			max = max ?? 1;
-
-			if (min > max) return interaction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
-
-			if (min > 10 || min < 1 || max > 10 || max < 1) {
-				return modalInteraction.reply({ content: 'The minimum or maximum amount of files cannot be greater than 10 or less than 1 for this type of question!', ephemeral: true });
-			}
+			if ((min ?? 1) > (max ?? 10)) return modalInteraction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
 
 			await Questions.create({
 				form_channel_id: currentForm.form_channel_id,
@@ -95,13 +73,8 @@ async function addCommand(interaction, currentForm) {
 		}
 		case 'select': {
 			min = min ?? 1;
-			max = max ?? 1;
-
-			if (min > max) return interaction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
-
-			if (min > 25 || min < 1 || max > 25 || max < 1) {
-				return modalInteraction.reply({ content: 'The minimum or maximum amount of options cannot be greater than 25 or less than 1 for this type of question!', ephemeral: true });
-			}
+			max = max ?? 25;
+			if (min > max) return modalInteraction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
 
 			const filter = m => m.author.id === modalInteraction.user.id;
 			const collector = interaction.channel.createMessageCollector({ filter, max: 25, time: 43_200_000 });
@@ -131,8 +104,16 @@ async function addCommand(interaction, currentForm) {
 					}
 				}
 
-				if (options.length < 2) {
-					return modalInteraction.followUp({ content: 'You must have at least 2 options!', ephemeral: true });
+				if (options.length < 1) {
+					return modalInteraction.followUp({ content: 'You must have at least 1 option!', ephemeral: true });
+				}
+
+				if (options.length < min) {
+					min = options.length;
+				}
+
+				if (max > options.length) {
+					max = options.length;
 				}
 
 				await Questions.create({

@@ -24,36 +24,129 @@ module.exports = {
 			subcommand.setName('list')
 				.setDescription('Lists all questions in the application form'),
 		)
-		.addSubcommand(subcommand =>
-			subcommand.setName('add')
+		// new changes
+		.addSubcommandGroup(subcommandGroup =>
+			subcommandGroup.setName('add')
 				.setDescription('Add a question to the application form')
-				.addStringOption(option =>
-					option.setName('type')
-						.setDescription('The type of question')
-						.setRequired(true)
-						.addChoices(
-							{ name: 'Text', value: 'text' },
-							{ name: 'Number', value: 'number' },
-							{ name: 'Select', value: 'select' },
-							{ name: 'File Upload', value: 'fileupload' },
+				.addSubcommand(subcommand =>
+					subcommand.setName('text')
+						.setDescription('Add a text question to the application form')
+						.addBooleanOption(option =>
+							option.setName('required')
+								.setDescription('Is the question required (default: false)')
+								.setRequired(false),
+						)
+						.addIntegerOption(option =>
+							option.setName('min')
+								.setDescription('Minimum amount of characters (default: 1)')
+								.setRequired(false)
+								.setMinValue(1)
+								.setMaxValue(2000),
+						)
+						.addIntegerOption(option =>
+							option.setName('max')
+								.setDescription('Maximum amount of characters (default: 2000)')
+								.setRequired(false)
+								.setMinValue(1)
+								.setMaxValue(2000),
 						),
 				)
-				.addBooleanOption(option =>
-					option.setName('required')
-						.setDescription('Is the question required')
-						.setRequired(false),
+				.addSubcommand(subcommand =>
+					subcommand.setName('number')
+						.setDescription('Add a number question to the application form')
+						.addBooleanOption(option =>
+							option.setName('required')
+								.setDescription('Is the question required (default: false)')
+								.setRequired(false),
+						)
+						.addIntegerOption(option =>
+							option.setName('min')
+								.setDescription('Minimum number (default: No limit)')
+								.setRequired(false),
+						)
+						.addIntegerOption(option =>
+							option.setName('max')
+								.setDescription('Maximum number (default: No limit)')
+								.setRequired(false),
+						),
 				)
-				.addIntegerOption(option =>
-					option.setName('min')
-						.setDescription('Minimum value of x for y type question')
-						.setRequired(false),
+				.addSubcommand(subcommand =>
+					subcommand.setName('select')
+						.setDescription('Add a select question to the application form')
+						.addBooleanOption(option =>
+							option.setName('required')
+								.setDescription('Is the question required (default: false)')
+								.setRequired(false),
+						)
+						.addIntegerOption(option =>
+							option.setName('min')
+								.setDescription('Minimum amount of options (default: 1)')
+								.setRequired(false)
+								.setMinValue(1)
+								.setMaxValue(25),
+						)
+						.addIntegerOption(option =>
+							option.setName('max')
+								.setDescription('Maximum amount of options (default: 25)')
+								.setRequired(false)
+								.setMinValue(1)
+								.setMaxValue(25),
+						),
 				)
-				.addIntegerOption(option =>
-					option.setName('max')
-						.setDescription('Maximum value of x for y type question')
-						.setRequired(false),
+				.addSubcommand(subcommand =>
+					subcommand.setName('fileupload')
+						.setDescription('Add a file upload question to the application form')
+						.addBooleanOption(option =>
+							option.setName('required')
+								.setDescription('Is the question required (default: false)')
+								.setRequired(false),
+						)
+						.addIntegerOption(option =>
+							option.setName('min')
+								.setDescription('Minimum amount of files (default: 1)')
+								.setRequired(false)
+								.setMinValue(1)
+								.setMaxValue(10),
+						)
+						.addIntegerOption(option =>
+							option.setName('max')
+								.setDescription('Maximum amount of files (default: 10)')
+								.setRequired(false)
+								.setMinValue(1)
+								.setMaxValue(10),
+						),
 				),
 		)
+		// .addSubcommand(subcommand =>
+		// 	subcommand.setName('add')
+		// 		.setDescription('Add a question to the application form')
+		// 		.addStringOption(option =>
+		// 			option.setName('type')
+		// 				.setDescription('The type of question')
+		// 				.setRequired(true)
+		// 				.addChoices(
+		// 					{ name: 'Text', value: 'text' },
+		// 					{ name: 'Number', value: 'number' },
+		// 					{ name: 'Select', value: 'select' },
+		// 					{ name: 'File Upload', value: 'fileupload' },
+		// 				),
+		// 		)
+		// 		.addBooleanOption(option =>
+		// 			option.setName('required')
+		// 				.setDescription('Is the question required')
+		// 				.setRequired(false),
+		// 		)
+		// 		.addIntegerOption(option =>
+		// 			option.setName('min')
+		// 				.setDescription('Minimum value of x for y type question')
+		// 				.setRequired(false),
+		// 		)
+		// 		.addIntegerOption(option =>
+		// 			option.setName('max')
+		// 				.setDescription('Maximum value of x for y type question')
+		// 				.setRequired(false),
+		// 		),
+		// )
 		.addSubcommand(subcommand =>
 			subcommand.setName('remove')
 				.setDescription('Remove a question from the application form')
@@ -95,8 +188,11 @@ module.exports = {
 			await listCommand(interaction, currentForm);
 			break;
 		}
-		case 'add': {
-			await addCommand(interaction, currentForm);
+		case 'text':
+		case 'number':
+		case 'select':
+		case 'fileupload': {
+			await addCommand(interaction, currentForm, subcommand);
 			break;
 		}
 		case 'remove': {
