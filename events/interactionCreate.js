@@ -1,6 +1,8 @@
 const { Collection, Events, ChannelType } = require('discord.js');
-const { Forms, Questions } = require('@database');
-const { textQuestionCollector } = require('@utils/questions.js');
+const { Forms, Answers } = require('@database');
+const { textQuestionCollector, numberQuestionCollector, selectQuestionCollector, fileUploadQuestionCollector } = require('@utils/questions.js');
+const { formSubmittedEmbed, formFinishedEmbed } = require('@utils/embeds.js');
+const { executeAction } = require('@utils/actions.js');
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -49,11 +51,6 @@ module.exports = {
 				const formChannelId = button.split('-')[1];
 				const form = await Forms.findOne({
 					where: { form_channel_id: formChannelId },
-					include: [{
-						model: Questions,
-						as: 'questions',
-						order: [['order', 'ASC']],
-					}],
 				});
 				if (!form.enabled) {
 					return interaction.reply({ content: 'This form is currently not open for submissions.', ephemeral: true });
@@ -67,11 +64,66 @@ module.exports = {
 				await thread.members.add(interaction.user.id);
 				await thread.send({ content: `Welcome to your application, ${interaction.user}! Please answer the following questions to the best of your ability.` });
 
-				for (const question of form.questions) {
+				const application = await form.createApplication({
+					form_channel_id: interaction.channel.id,
+					thread_id: thread.id,
+					user_id: interaction.user.id,
+					submitted: false,
+				});
+
+				const questions = await form.getQuestions({ order: [['order', 'ASC']] });
+				for (const question of questions) {
 					switch (question.type) {
 					case 'text': {
 						const response = await textQuestionCollector(interaction, thread, question);
-						if (response === undefined) return;
+						if (response === undefined) break;
+						await Answers.create({
+							thread_id: thread.id,
+							question_id: question.question_id,
+							answer: {
+								type: 'text',
+								content: response,
+							},
+						});
+						break;
+					}
+					case 'number': {
+						const response = await numberQuestionCollector(interaction, thread, question);
+						if (response === undefined) break;
+						await Answers.create({
+							thread_id: thread.id,
+							question_id: question.question_id,
+							answer: {
+								type: 'number',
+								content: response,
+							},
+						});
+						break;
+					}
+					case 'select': {
+						const response = await selectQuestionCollector(interaction, thread, question);
+						if (response === undefined) break;
+						await Answers.create({
+							thread_id: thread.id,
+							question_id: question.question_id,
+							answer: {
+								type: 'select',
+								content: response,
+							},
+						});
+						break;
+					}
+					case 'fileupload': {
+						const response = await fileUploadQuestionCollector(interaction, thread, question);
+						if (response === undefined) break;
+						await Answers.create({
+							thread_id: thread.id,
+							question_id: question.question_id,
+							answer: {
+								type: 'fileupload',
+								content: response,
+							},
+						});
 						break;
 					}
 					default: {
@@ -79,6 +131,62 @@ module.exports = {
 						break;
 					}
 					}
+				}
+				await thread.send(formSubmittedEmbed(thread));
+				await application.update({
+					submitted: true,
+					submitted_at: new Date(),
+				});
+			} else if (button.startsWith('approve-') || button.startsWith('deny-')) {
+				const form = await Forms.findOne({
+					where: { form_channel_id: interaction.channel.parentId },
+				});
+				const actions = await form.getActions();
+				if (actions.length === 0) {
+					return interaction.reply({ content: 'This form has no actions set.', ephemeral: true });
+				}
+
+				const applications = await form.getApplications({
+					where: { thread_id: button.split('-')[1] },
+				});
+
+				const application = applications[0];
+
+				const member = await interaction.guild.members.fetch(application.user_id);
+				if (member === null) {
+					return interaction.reply({ content: 'Unable to find member for this application. Cannot execute actions if the member is not present in the guild.', ephemeral: true });
+				}
+
+				await interaction.deferUpdate();
+
+				const approved = button.startsWith('approve-');
+				const thread = await interaction.guild.channels.fetch(button.split('-')[1]);
+				let threadDeleted = false;
+				await Promise.all(actions.map(async action => {
+					if (action.when === 'approved' && approved) {
+						if (action.do === 'delete') {
+							await thread.delete();
+							threadDeleted = true;
+						} else {
+							await executeAction(interaction, member, action);
+						}
+					} else if (action.when === 'rejected' && !approved) {
+						if (action.do === 'delete') {
+							await thread.delete();
+							threadDeleted = true;
+						} else {
+							await executeAction(interaction, member, action);
+						}
+					}
+				}));
+				if (!threadDeleted) {
+					await interaction.followUp(formFinishedEmbed(approved));
+					await thread.setArchived(true);
+					await application.update({
+						approved,
+					});
+				} else {
+					await application.destroy();
 				}
 			}
 		}

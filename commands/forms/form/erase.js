@@ -1,5 +1,5 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { Forms, Questions, Actions, Roles, Applications, Answers } = require('@database');
+const { Forms, Questions, Actions, Roles, Applications } = require('@database');
 
 async function eraseCommand(interaction, currentForm) {
 	const confirm = new ButtonBuilder()

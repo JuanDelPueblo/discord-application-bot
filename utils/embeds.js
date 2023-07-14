@@ -23,7 +23,7 @@ module.exports = {
 			.setColor(color)
 			.setTitle(`Question #${question.order}: ${question.title}`);
 		if (question.description) embed.setDescription(question.description);
-
+		if (question.min && question.max) embed.setFooter({ text: `Min: ${question.min} | Max: ${question.max}` });
 		return { embeds: [embed] };
 	},
 	selectQuestionEmbed(thread, question) {
@@ -45,5 +45,34 @@ module.exports = {
 			.addComponents(selectMenu);
 
 		return { embeds: [embed], components: [row] };
+	},
+	formSubmittedEmbed(thread) {
+		const embed = new EmbedBuilder()
+			.setColor(color)
+			.setTitle('Form submitted!')
+			.setDescription('Thank you for submitting your form. Your application will be reviewed shortly.');
+
+		const approveButton = new ButtonBuilder()
+			.setCustomId(`approve-${thread.id}`)
+			.setLabel('Approve')
+			.setStyle(ButtonStyle.Success);
+
+		const denyButton = new ButtonBuilder()
+			.setCustomId(`deny-${thread.id}`)
+			.setLabel('Deny')
+			.setStyle(ButtonStyle.Danger);
+
+		const buttonRow = new ActionRowBuilder()
+			.addComponents(approveButton, denyButton);
+
+		return { embeds: [embed], components: [buttonRow] };
+	},
+	formFinishedEmbed(approved) {
+		const embed = new EmbedBuilder()
+			.setColor(color)
+			.setTitle('Form reviewed!')
+			.setDescription(`This form has been ${approved ? 'approved' : 'rejected'}.`);
+
+		return { embeds: [embed] };
 	},
 };

@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
 		question_id: { // ID of the question
 			type: DataTypes.STRING,
 			allowNull: false,
-			unique: true,
 		},
 		answer: { // answer to the question
 			type: DataTypes.JSON,
