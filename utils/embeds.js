@@ -102,4 +102,25 @@ module.exports = {
 
 		return { embeds: [embed] };
 	},
+	questionRemoveEmbed(question) {
+		const embed = new EmbedBuilder()
+			.setColor(color)
+			.setTitle(`Are you sure you want to remove the question with ID #${question.question_id}?`)
+			.setDescription('This will permanently remove the question and all of its answers from this form!');
+
+		const confirmButton = new ButtonBuilder()
+			.setCustomId(`confirm-remove-question-${question.question_id}`)
+			.setLabel('Confirm')
+			.setStyle(ButtonStyle.Danger);
+
+		const cancelButton = new ButtonBuilder()
+			.setCustomId(`cancel-remove-question-${question.question_id}`)
+			.setLabel('Cancel')
+			.setStyle(ButtonStyle.Secondary);
+
+		const buttonRow = new ActionRowBuilder()
+			.addComponents(confirmButton, cancelButton);
+
+		return { embeds: [embed], components: [buttonRow], ephemeral: true };
+	},
 };

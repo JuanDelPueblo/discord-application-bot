@@ -1,4 +1,5 @@
 const { Questions } = require('@database');
+const { questionRemoveEmbed } = require('@utils/embeds.js');
 
 async function removeCommand(interaction, currentForm) {
 	const id = await interaction.options.getInteger('id');
@@ -15,7 +16,11 @@ async function removeCommand(interaction, currentForm) {
 		return;
 	}
 
-	// TODO: Add a confirmation step
+	const confirmationMsg = await interaction.reply(questionRemoveEmbed(questionToRemove));
+	const filter = i => i.user.id === interaction.user.id;
+	const response = await confirmationMsg.awaitMessageComponent({ filter, time: 43_200_000 });
+
+	if (response.customId.startsWith('cancel-remove-question-')) return response.update({ content: 'Question removal cancelled.', components: [], embeds: [] });
 
 	const removedOrder = questionToRemove.order;
 	for (let i = removedOrder; i < questions.length; i++) {
@@ -26,11 +31,10 @@ async function removeCommand(interaction, currentForm) {
 
 	await questionToRemove.destroy();
 
-	await interaction.reply({ content: 'The question has been removed from this form!', ephemeral: true });
+	await response.update({ content: 'The question has been removed from this form!', components: [], embeds: []});
 
 	const updatedQuestions = await Questions.findAll({
 		where: { form_channel_id: currentForm.form_channel_id },
-		order: [['order', 'ASC']],
 	});
 
 	if (updatedQuestions.length < 1) {
