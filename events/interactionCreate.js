@@ -138,12 +138,14 @@ module.exports = {
 					submitted_at: new Date(),
 				});
 			} else if (button.startsWith('approve-') || button.startsWith('deny-')) {
+				const approved = button.startsWith('approve-');
+				await interaction.reply(formFinishedEmbed(approved));
 				const form = await Forms.findOne({
 					where: { form_channel_id: interaction.channel.parentId },
 				});
 				const actions = await form.getActions();
 				if (actions.length === 0) {
-					return interaction.reply({ content: 'This form has no actions set.', ephemeral: true });
+					return interaction.followUp({ content: 'This form has no actions set.', ephemeral: true });
 				}
 
 				const applications = await form.getApplications({
@@ -154,12 +156,9 @@ module.exports = {
 
 				const member = await interaction.guild.members.fetch(application.user_id);
 				if (member === null) {
-					return interaction.reply({ content: 'Unable to find member for this application. Cannot execute actions if the member is not present in the guild.', ephemeral: true });
+					return interaction.followUp({ content: 'Unable to find member for this application. Cannot execute actions if the member is not present in the guild.', ephemeral: true });
 				}
 
-				await interaction.deferUpdate();
-
-				const approved = button.startsWith('approve-');
 				const thread = await interaction.guild.channels.fetch(button.split('-')[1]);
 				let threadDeleted = false;
 				await Promise.all(actions.map(async action => {
@@ -180,7 +179,6 @@ module.exports = {
 					}
 				}));
 				if (!threadDeleted) {
-					await interaction.followUp(formFinishedEmbed(approved));
 					await thread.setArchived(true);
 					await application.update({
 						approved,
