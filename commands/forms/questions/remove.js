@@ -31,7 +31,7 @@ async function removeCommand(interaction, currentForm) {
 
 	await questionToRemove.destroy();
 
-	await response.update({ content: 'The question has been removed from this form!', components: [], embeds: []});
+	await response.update({ content: 'The question has been removed from this form!', components: [], embeds: [] });
 
 	const updatedQuestions = await Questions.findAll({
 		where: { form_channel_id: currentForm.form_channel_id },

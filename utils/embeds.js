@@ -123,4 +123,18 @@ module.exports = {
 
 		return { embeds: [embed], components: [buttonRow], ephemeral: true };
 	},
+	formTutorialEmbed() {
+		const embed = new EmbedBuilder()
+			.setColor(color)
+			.setTitle('You have successfully created a new form!')
+			.setDescription(' Now you can configure it to your liking with the following commands. Once you are done, you can start accepting new applications with the command `/form submit True`')
+			.addFields(
+				{ name: '/question', value: 'Manage questions from this form.' },
+				{ name: '/action', value: 'Manage actions to take on approval/rejection' },
+				{ name: '/role', value: 'Manage permissions for specific roles' },
+				{ name: '/form', value: 'Manage the form itself' },
+			);
+
+		return { embeds: [embed], ephemeral: true };
+	},
 };
