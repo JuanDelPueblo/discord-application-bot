@@ -186,9 +186,27 @@ module.exports = {
 				.addStringOption(option =>
 					option.setName('name')
 						.setDescription('Name that identifies the action')
-						.setRequired(true),
+						.setRequired(true)
+						.setAutocomplete(true),
 				),
 		),
+	async autocomplete(interaction) {
+		const subcommand = interaction.options.getSubcommand();
+		const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+
+		if (!currentForm) {
+			return await interaction.respond([]);
+		}
+
+		if (subcommand === 'remove') {
+			const actions = await currentForm.getActions();
+			const focusedValue = interaction.options.getFocused();
+			const filtered = actions.filter(action => action.name.startsWith(focusedValue)).slice(0, 25);
+			await interaction.respond(
+				filtered.map(action => ({ name: action.name, value: action.name })),
+			);
+		}
+	},
 	async execute(interaction) {
 		const subcommand = interaction.options.getSubcommand();
 		const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });

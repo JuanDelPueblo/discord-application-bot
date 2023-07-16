@@ -263,6 +263,16 @@ module.exports = {
 					await interaction.reply({ content: 'An error occurred while processing your request.', ephemeral: true });
 				}
 			}
+		} else if (interaction.isAutocomplete()) {
+			const command = interaction.client.commands.get(interaction.commandName);
+
+			if (!command) return;
+
+			try {
+				await command.autocomplete(interaction);
+			} catch (error) {
+				console.error(error);
+			}
 		}
 	},
 };

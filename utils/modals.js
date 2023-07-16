@@ -10,6 +10,7 @@ module.exports = {
 			.setCustomId(`form_title-${interaction.channel.id}`)
 			.setRequired(true)
 			.setLabel('Form Title')
+			.setMaxLength(256)
 			.setStyle(TextInputStyle.Short);
 
 		const formDescriptionInput = new TextInputBuilder()
@@ -21,6 +22,7 @@ module.exports = {
 		const formButtonTextInput = new TextInputBuilder()
 			.setCustomId(`form_button_text-${interaction.channel.id}`)
 			.setRequired(false)
+			.setMaxLength(80)
 			.setLabel('Form Button Text')
 			.setPlaceholder('New Application')
 			.setStyle(TextInputStyle.Short);
@@ -46,6 +48,7 @@ module.exports = {
 		const questionTitleInput = new TextInputBuilder()
 			.setCustomId(`question_title-${interaction.channel.id}`)
 			.setRequired(true)
+			.setMaxLength(256)
 			.setLabel('Question Title')
 			.setStyle(TextInputStyle.Short);
 

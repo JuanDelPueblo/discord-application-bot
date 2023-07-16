@@ -123,7 +123,8 @@ module.exports = {
 				.addIntegerOption(option =>
 					option.setName('id')
 						.setDescription('The question id')
-						.setRequired(true),
+						.setRequired(true)
+						.setAutocomplete(true),
 				),
 		)
 		.addSubcommand(subcommand =>
@@ -140,6 +141,26 @@ module.exports = {
 						.setRequired(true),
 				),
 		),
+	async autocomplete(interaction) {
+		const subcommand = interaction.options.getSubcommand();
+		const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+
+		if (!currentForm) {
+			return await interaction.respond([]);
+		}
+
+		if (subcommand === 'remove') {
+			const questions = await currentForm.getQuestions();
+			const focusedValue = interaction.options.getFocused();
+			const filtered = questions.filter(question => {
+				const questionId = question.question_id;
+				return String(questionId).startsWith(focusedValue);
+			}).slice(0, 25);
+			await interaction.respond(
+				filtered.map(question => ({ name: question.title, value: question.question_id })),
+			);
+		}
+	},
 	async execute(interaction) {
 		const subcommand = interaction.options.getSubcommand();
 		const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
