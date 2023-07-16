@@ -44,7 +44,6 @@ module.exports = {
 	async execute(interaction) {
 		const subcommand = await interaction.options.getSubcommand();
 		const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
-		const messages = await interaction.channel.messages.fetch();
 
 		if (!currentForm && !['list', 'setup'].includes(subcommand)) {
 			await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true });
@@ -59,8 +58,6 @@ module.exports = {
 		case 'setup': {
 			if (currentForm) {
 				await interaction.reply({ content: 'This channel is already a form channel!', ephemeral: true });
-			} else if (messages.size > 1) {
-				await interaction.reply({ content: 'This channel already has messages! Please start from a empty channel.', ephemeral: true });
 			} else {
 				await setupCommand(interaction);
 			}
