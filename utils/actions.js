@@ -1,50 +1,55 @@
 async function executeAction(interaction, member, action) {
-	switch (action.do) {
-	case 'removerole': {
-		const role = interaction.guild.roles.cache.get(action.role_id);
-		if (!role) {
-			await interaction.followUp({ content: 'The role for this action no longer exists!', ephemeral: true });
-			return;
+	try {
+		switch (action.do) {
+		case 'removerole': {
+			const role = interaction.guild.roles.cache.get(action.role_id);
+			if (!role) {
+				await interaction.followUp({ content: 'The role for this action no longer exists!', ephemeral: true });
+				return;
+			}
+			if (member.roles.cache.has(role.id)) {
+				await member.roles.remove(role);
+			}
+			break;
 		}
-		if (member.roles.cache.has(role.id)) {
-			await member.roles.remove(role);
+		case 'addrole': {
+			const role = interaction.guild.roles.cache.get(action.role_id);
+			if (!role) {
+				await interaction.followUp({ content: 'The role for this action no longer exists!', ephemeral: true });
+				return;
+			}
+			if (!member.roles.cache.has(role.id)) {
+				await member.roles.add(role);
+			}
+			break;
 		}
-		break;
-	}
-	case 'addrole': {
-		const role = interaction.guild.roles.cache.get(action.role_id);
-		if (!role) {
-			await interaction.followUp({ content: 'The role for this action no longer exists!', ephemeral: true });
-			return;
+		case 'ban': {
+			const reason = action.reason ?? 'No reason given';
+			await interaction.guild.members.ban(member, { reason });
+			break;
 		}
-		if (!member.roles.cache.has(role.id)) {
-			await member.roles.add(role);
+		case 'kick': {
+			const reason = action.reason ?? 'No reason given';
+			await interaction.guild.members.kick(member, { reason });
+			break;
 		}
-		break;
-	}
-	case 'ban': {
-		const reason = action.reason ?? 'No reason given';
-		await interaction.guild.members.ban(member, { reason });
-		break;
-	}
-	case 'kick': {
-		const reason = action.reason ?? 'No reason given';
-		await interaction.guild.members.kick(member, { reason });
-		break;
-	}
-	case 'sendmessage': {
-		const channel = interaction.guild.channels.cache.get(action.message_channel_id);
-		if (!channel) {
-			await interaction.followUp({ content: 'The channel for this action no longer exists!', ephemeral: true });
-			return;
+		case 'sendmessage': {
+			const channel = interaction.guild.channels.cache.get(action.message_channel_id);
+			if (!channel) {
+				await interaction.followUp({ content: 'The channel for this action no longer exists!', ephemeral: true });
+				return;
+			}
+			await channel.send(action.message);
+			break;
 		}
-		await channel.send(action.message);
-		break;
-	}
-	case 'sendmessagedm': {
-		await member.send(action.message);
-		break;
-	}
+		case 'sendmessagedm': {
+			await member.send(action.message);
+			break;
+		}
+		}
+	} catch (error) {
+		console.error(error);
+		await interaction.followUp({ content: `An error occurred while executing action ${action.name}: ${error}`, ephemeral: true });
 	}
 }
 

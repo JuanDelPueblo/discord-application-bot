@@ -139,20 +139,27 @@ module.exports = {
 				});
 			} else if (button.startsWith('approve-') || button.startsWith('deny-')) {
 				const approved = button.startsWith('approve-');
-				await interaction.reply(formFinishedEmbed(approved));
+
 				const form = await Forms.findOne({
 					where: { form_channel_id: interaction.channel.parentId },
 				});
-				const actions = await form.getActions();
-				if (actions.length === 0) {
-					return interaction.followUp({ content: 'This form has no actions set.', ephemeral: true });
+				if (form === null) {
+					return interaction.reply({ content: 'Unable to find form for this application.', ephemeral: true });
 				}
 
 				const applications = await form.getApplications({
 					where: { thread_id: button.split('-')[1] },
 				});
-
 				const application = applications[0];
+				await application.update({
+					approved,
+				});
+				await interaction.reply(formFinishedEmbed(approved));
+
+				const actions = await form.getActions();
+				if (actions.length === 0) {
+					return interaction.followUp({ content: 'This form has no actions set.', ephemeral: true });
+				}
 
 				const member = await interaction.guild.members.fetch(application.user_id);
 				if (member === null) {
@@ -180,9 +187,6 @@ module.exports = {
 				}));
 				if (!threadDeleted) {
 					await thread.setArchived(true);
-					await application.update({
-						approved,
-					});
 				} else {
 					await application.destroy();
 				}
