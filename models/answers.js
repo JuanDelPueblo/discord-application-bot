@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: false,
 		},
 		question_id: { // ID of the question
-			type: DataTypes.STRING,
+			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
 		answer: { // answer to the question

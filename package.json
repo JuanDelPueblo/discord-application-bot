@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/JuanDelPueblo/discord-application-bot#readme",
   "dependencies": {
+    "@json2csv/plainjs": "^7.0.1",
     "discord.js": "^14.11.0",
     "module-alias": "^2.2.3",
     "sequelize": "^6.32.0",
