@@ -34,7 +34,6 @@ async function exportCommand(interaction, currentForm) {
 
 	const parser = new Parser();
 	const parsedData = parser.parse(csvData);
-	console.log(parsedData);
 
 	if (!fs.existsSync('./data')) {
 		fs.mkdirSync('./data');

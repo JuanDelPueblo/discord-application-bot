@@ -7,7 +7,7 @@ const configInit = require('./initializers/configInit.js');
 function main() {
 	const { token } = require('@config');
 
-	const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessageReactions] });
+	const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessageReactions] });
 
 	client.commands = new Collection();
 	client.cooldowns = new Collection();

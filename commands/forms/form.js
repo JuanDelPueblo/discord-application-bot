@@ -1,4 +1,4 @@
-const { channelMention, SlashCommandBuilder } = require('discord.js');
+const { channelMention, SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { Forms } = require('@database');
 const { setupCommand } = require('./form/setup.js');
 const { editCommand } = require('./form/edit.js');
@@ -11,6 +11,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('form')
 		.setDescription('Form commands')
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.addSubcommand(subcommand =>
 			subcommand.setName('submit')
 				.setDescription('Enable or disable new applications submissions')

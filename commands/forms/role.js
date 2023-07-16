@@ -1,4 +1,4 @@
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { Forms, Roles } = require('@database');
 const { color } = require('@config');
 
@@ -7,6 +7,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('role')
 		.setDescription('Configures which roles can view, act on, or edit a form')
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.addSubcommand(subcommand =>
 			subcommand.setName('list')
 				.setDescription('Lists all roles with permissions to view, act on, or edit a form'),
@@ -26,7 +27,6 @@ module.exports = {
 						.addChoices(
 							{ name: 'View applications only', value: 'view' },
 							{ name: 'View and take action on applications', value: 'action' },
-							{ name: 'View, take action, and edit the form', value: 'edit' },
 						),
 				),
 		)
@@ -62,7 +62,6 @@ module.exports = {
 					let rolePermissions = 'No permissions set for this role';
 					if (role.permission === 'view') rolePermissions = 'Can view applications';
 					if (role.permission === 'action') rolePermissions = 'Can view and take action on applications';
-					if (role.permission === 'edit') rolePermissions = 'Can view, take action, and edit the form';
 					embed.addFields({
 						name: `${roleObj.name}`,
 						value: rolePermissions,

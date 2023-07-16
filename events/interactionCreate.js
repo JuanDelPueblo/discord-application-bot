@@ -56,11 +56,22 @@ module.exports = {
 					return interaction.reply({ content: 'This form is currently not open for submissions.', ephemeral: true });
 				}
 				await interaction.deferUpdate();
+
 				const thread = await interaction.channel.threads.create({
 					name: `${interaction.user.username}'s application`,
 					autoArchiveDuration: 10080,
 					type: ChannelType.PrivateThread,
 				});
+
+				const rolePermissions = await form.getRoles();
+				for (const rolePermission of rolePermissions.filter(r => r.permission !== 'none')) {
+					const role = await interaction.guild.roles.fetch(rolePermission.role_id);
+					if (role === undefined) continue;
+					const members = await role.members.values();
+					for (const member of members) {
+						await thread.members.add(member.user.id);
+					}
+				}
 				await thread.members.add(interaction.user.id);
 				await thread.send({ content: `Welcome to your application, ${interaction.user}! Please answer the following questions to the best of your ability.` });
 
@@ -147,6 +158,23 @@ module.exports = {
 					return interaction.reply({ content: 'Unable to find form for this application.', ephemeral: true });
 				}
 
+				const rolePermissions = await form.getRoles();
+				const roles = await Promise.all(rolePermissions
+					.filter(r => r.permission === 'action')
+					.map(async role => await interaction.guild.roles.fetch(role.role_id)));
+				const member = await interaction.guild.members.fetch(interaction.user.id);
+				let hasPermission = false;
+				for (const role of roles) {
+					if (role === undefined) continue;
+					if (member.roles.cache.some(r => r.name === role.name)) {
+						hasPermission = true;
+					}
+				}
+				if (!hasPermission) {
+					await interaction.deferUpdate();
+					return;
+				}
+
 				const applications = await form.getApplications({
 					where: { thread_id: button.split('-')[1] },
 				});
@@ -161,8 +189,8 @@ module.exports = {
 					return interaction.followUp({ content: 'This form has no actions set.', ephemeral: true });
 				}
 
-				const member = await interaction.guild.members.fetch(application.user_id);
-				if (member === null) {
+				const appMember = await interaction.guild.members.fetch(application.user_id);
+				if (appMember === null) {
 					return interaction.followUp({ content: 'Unable to find member for this application. Cannot execute actions if the member is not present in the guild.', ephemeral: true });
 				}
 
@@ -174,14 +202,14 @@ module.exports = {
 							await thread.delete();
 							threadDeleted = true;
 						} else {
-							await executeAction(interaction, member, action);
+							await executeAction(interaction, appMember, action);
 						}
 					} else if (action.when === 'rejected' && !approved) {
 						if (action.do === 'delete') {
 							await thread.delete();
 							threadDeleted = true;
 						} else {
-							await executeAction(interaction, member, action);
+							await executeAction(interaction, appMember, action);
 						}
 					}
 				}));

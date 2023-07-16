@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { Forms } = require('@database');
 const { editCommand } = require('./questions/edit.js');
 const { addCommand } = require('./questions/add.js');
@@ -11,6 +11,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('question')
 		.setDescription('Question commands')
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.addSubcommand(subcommand =>
 			subcommand.setName('edit')
 				.setDescription('Edit a question in the application form')
@@ -24,7 +25,6 @@ module.exports = {
 			subcommand.setName('list')
 				.setDescription('Lists all questions in the application form'),
 		)
-		// new changes
 		.addSubcommandGroup(subcommandGroup =>
 			subcommandGroup.setName('add')
 				.setDescription('Add a question to the application form')
@@ -117,36 +117,6 @@ module.exports = {
 						),
 				),
 		)
-		// .addSubcommand(subcommand =>
-		// 	subcommand.setName('add')
-		// 		.setDescription('Add a question to the application form')
-		// 		.addStringOption(option =>
-		// 			option.setName('type')
-		// 				.setDescription('The type of question')
-		// 				.setRequired(true)
-		// 				.addChoices(
-		// 					{ name: 'Text', value: 'text' },
-		// 					{ name: 'Number', value: 'number' },
-		// 					{ name: 'Select', value: 'select' },
-		// 					{ name: 'File Upload', value: 'fileupload' },
-		// 				),
-		// 		)
-		// 		.addBooleanOption(option =>
-		// 			option.setName('required')
-		// 				.setDescription('Is the question required')
-		// 				.setRequired(false),
-		// 		)
-		// 		.addIntegerOption(option =>
-		// 			option.setName('min')
-		// 				.setDescription('Minimum value of x for y type question')
-		// 				.setRequired(false),
-		// 		)
-		// 		.addIntegerOption(option =>
-		// 			option.setName('max')
-		// 				.setDescription('Maximum value of x for y type question')
-		// 				.setRequired(false),
-		// 		),
-		// )
 		.addSubcommand(subcommand =>
 			subcommand.setName('remove')
 				.setDescription('Remove a question from the application form')
