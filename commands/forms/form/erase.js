@@ -1,14 +1,14 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { Forms, Questions, Actions, Roles, Applications } = require('@database');
+const { Questions, Actions, Roles, Applications } = require('@database');
 
 async function eraseCommand(interaction, currentForm) {
 	const confirm = new ButtonBuilder()
-		.setCustomId('erase')
+		.setCustomId(`erase-${currentForm.form_channel_id}`)
 		.setLabel('Erase Form')
 		.setStyle(ButtonStyle.Danger);
 
 	const cancel = new ButtonBuilder()
-		.setCustomId('cancel')
+		.setCustomId(`cancel-${currentForm.form_channel_id}`)
 		.setLabel('Cancel')
 		.setStyle(ButtonStyle.Secondary);
 
@@ -26,19 +26,20 @@ async function eraseCommand(interaction, currentForm) {
 	try {
 		const confirmation = await response.awaitMessageComponent({ filter: filter, time: 43_200_000 });
 
-		if (confirmation.customId === 'erase') {
+		if (confirmation.customId.startsWith('erase-')) {
+			// delete the form embed
 			await interaction.channel.messages.fetch(currentForm.embed_message_id).then(msg => msg.delete());
-			const form = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+			// destroy everything related to the form by hand
 			const questions = await Questions.findAll({
-				where: { form_channel_id: form.form_channel_id },
+				where: { form_channel_id: currentForm.form_channel_id },
 			});
 			for (const question of questions) {
 				await question.destroy();
 			}
-			await form.destroy();
-			await Actions.destroy({ where: { form_channel_id: form.form_channel_id } });
-			await Roles.destroy({ where: { form_channel_id: form.form_channel_id } });
-			await Applications.destroy({ where: { form_channel_id: form.form_channel_id } });
+			await currentForm.destroy();
+			await Actions.destroy({ where: { form_channel_id: currentForm.form_channel_id } });
+			await Roles.destroy({ where: { form_channel_id: currentForm.form_channel_id } });
+			await Applications.destroy({ where: { form_channel_id: currentForm.form_channel_id } });
 			await confirmation.update({ content: 'Form has been successfully erased!', components: [] });
 		} else if (confirmation.customId === 'cancel') {
 			await confirmation.update({ content: 'Form erase cancelled', components: [] });

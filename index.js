@@ -7,13 +7,20 @@ const configInit = require('./initializers/configInit.js');
 function main() {
 	const { token } = require('@config');
 
-	const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessageReactions] });
+	const client = new Client({ intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildMessageReactions,
+	] });
 
 	client.commands = new Collection();
 	client.cooldowns = new Collection();
 	const foldersPath = path.join(__dirname, 'commands');
 	let commandFolders = fs.readdirSync(foldersPath);
 
+	// load commands from subfolders into the collection
 	commandFolders = commandFolders.filter((folder) => {
 		const folderPath = path.resolve(foldersPath, folder);
 		return fs.lstatSync(folderPath).isDirectory();
@@ -33,6 +40,7 @@ function main() {
 		}
 	}
 
+	// load events from the events folder and register them
 	const eventsPath = path.join(__dirname, 'events');
 	const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
@@ -49,6 +57,7 @@ function main() {
 	client.login(token);
 }
 
+// initialize the config and then start the bot
 configInit(path.resolve(__dirname)).then(configSuccess => {
 	if (configSuccess) {
 		console.log('Config initialized');

@@ -6,6 +6,7 @@ async function addCommand(interaction, currentForm, type) {
 	let min = interaction.options.getInteger('min');
 	let max = interaction.options.getInteger('max');
 
+	// get the question title and description via a modal
 	await editQuestionModal(interaction);
 	const modalFilter = i => i.customId.startsWith(`edit_question-${interaction.channel.id}`);
 	const modalInteraction = await interaction.awaitModalSubmit({ time: 43_200_000, modalFilter })
@@ -76,6 +77,7 @@ async function addCommand(interaction, currentForm, type) {
 			max = max ?? 25;
 			if (min > max) return modalInteraction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
 
+			// get the options via a message collector
 			const filter = m => m.author.id === modalInteraction.user.id;
 			const collector = interaction.channel.createMessageCollector({ filter, max: 25, time: 43_200_000 });
 
@@ -92,6 +94,7 @@ async function addCommand(interaction, currentForm, type) {
 			collector.on('end', async (collected) => {
 				const options = [];
 
+				// add all the options to the array except for the !done message and those with a 👎 reaction
 				for (const message of collected.values()) {
 					const reaction = await message.reactions.cache.get('👎');
 

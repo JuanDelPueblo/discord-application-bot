@@ -57,6 +57,7 @@ module.exports = {
 				const embed = new EmbedBuilder()
 					.setTitle('Roles with permissions for this form')
 					.setColor(color);
+				// set up embed fields with roles and permissions
 				roles.forEach(role => {
 					const roleObj = interaction.guild.roles.cache.get(role.role_id);
 					let rolePermissions = 'No permissions set for this role';

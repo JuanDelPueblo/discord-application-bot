@@ -15,6 +15,7 @@ module.exports = {
 				return;
 			}
 
+			// check command cooldown
 			const { cooldowns } = interaction.client;
 
 			if (!cooldowns.has(command.data.name)) {
@@ -47,7 +48,7 @@ module.exports = {
 		} else if (interaction.isButton()) {
 			const button = interaction.customId;
 
-			if (button.startsWith('form-')) {
+			if (button.startsWith('form-')) { // create a new application thread
 				try {
 					const formChannelId = button.split('-')[1];
 					const form = await Forms.findOne({
@@ -64,6 +65,7 @@ module.exports = {
 						type: ChannelType.PrivateThread,
 					});
 
+					// add all roles with permissions to view the form to the thread
 					const rolePermissions = await form.getRoles();
 					for (const rolePermission of rolePermissions.filter(r => r.permission !== 'none')) {
 						const role = await interaction.guild.roles.fetch(rolePermission.role_id);
@@ -83,6 +85,7 @@ module.exports = {
 						submitted: false,
 					});
 
+					// send all questions in order for the applicant to answer
 					const questions = await form.getQuestions({ order: [['order', 'ASC']] });
 					for (const question of questions) {
 						switch (question.type) {
@@ -154,7 +157,7 @@ module.exports = {
 					console.error(error);
 					return interaction.reply({ content: 'Unable to create application thread.', ephemeral: true });
 				}
-			} else if (button.startsWith('approve-') || button.startsWith('deny-')) {
+			} else if (button.startsWith('approve-') || button.startsWith('deny-')) { // approve or deny an application
 				try {
 					const approved = button.startsWith('approve-');
 
@@ -165,6 +168,7 @@ module.exports = {
 						return interaction.reply({ content: 'Unable to find form for this application.', ephemeral: true });
 					}
 
+					// check if the user has permission to approve/deny applications
 					const rolePermissions = await form.getRoles();
 					const roles = await Promise.all(rolePermissions
 						.filter(r => r.permission === 'action')
@@ -182,6 +186,7 @@ module.exports = {
 						return;
 					}
 
+					// update the application with the approval status
 					const applications = await form.getApplications({
 						where: { thread_id: button.split('-')[1] },
 					});
@@ -191,6 +196,7 @@ module.exports = {
 					});
 					await interaction.reply(formFinishedEmbed(approved));
 
+					// get all actions for this form
 					const actions = await form.getActions();
 					if (actions.length === 0) {
 						return interaction.followUp({ content: 'This form has no actions set.', ephemeral: true });
@@ -201,6 +207,7 @@ module.exports = {
 						return interaction.followUp({ content: 'Unable to find member for this application. Cannot execute actions if the member is not present in the guild.', ephemeral: true });
 					}
 
+					// execute actions
 					const thread = await interaction.guild.channels.fetch(button.split('-')[1]);
 					let threadDeleted = false;
 					await Promise.all(actions.map(async action => {
@@ -238,6 +245,7 @@ module.exports = {
 						return interaction.reply({ content: 'Unable to find form for this application.', ephemeral: true });
 					}
 
+					// check if the user has permission to lock or unlock applications for discussion
 					const rolePermissions = await form.getRoles();
 					const roles = await Promise.all(rolePermissions
 						.filter(r => r.permission === 'action')

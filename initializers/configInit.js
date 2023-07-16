@@ -6,7 +6,7 @@ module.exports = (rootDir) => {
 		const configFilePath = path.join(rootDir, 'config.json');
 
 		try {
-			if (!fs.existsSync(configFilePath)) {
+			if (!fs.existsSync(configFilePath)) { // generate config file if it doesn't exist
 				const initialConfig = {
 					token: 'your-token-here',
 					clientId: 'your-client-id-here',
@@ -22,7 +22,7 @@ module.exports = (rootDir) => {
 						resolve(false);
 					})
 					.catch(reject);
-			} else {
+			} else { // check if the database and commands have been deployed, and deploy them if not
 				const config = require(configFilePath);
 
 				if (!config.databaseDeployed) {

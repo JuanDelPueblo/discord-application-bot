@@ -22,9 +22,9 @@ module.exports = {
 						let args = '';
 						if (option.options) {
 							option.options.forEach(subOption => {
-								if (subOption.required) {
+								if (subOption.type !== ApplicationCommandOptionType.SUB_COMMAND && subOption.required) {
 									args += ` <${subOption.name}>`;
-								} else {
+								} else if (subOption.type !== ApplicationCommandOptionType.SUB_COMMAND) {
 									args += ` [${subOption.name}]`;
 								}
 							});

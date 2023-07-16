@@ -2,6 +2,7 @@ const { REST, Routes } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
+// load commands from subfolders into an array
 function loadCommands(rootDir) {
 	return new Promise((resolve, reject) => {
 		try {
@@ -40,6 +41,7 @@ function loadCommands(rootDir) {
 	});
 }
 
+// reload the commands on Discord
 module.exports = (rootDir, clientId, token) => {
 	return new Promise((resolve, reject) => {
 		try {

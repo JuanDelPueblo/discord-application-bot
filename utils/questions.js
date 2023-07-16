@@ -11,7 +11,6 @@ async function textQuestionCollector(interaction, thread, question) {
 				return m.author.id === interaction.user.id && (m.content.length >= min && m.content.length <= max);
 			};
 
-
 			let questionSkipped = false;
 			const skipFilter = i => i.user.id === interaction.user.id;
 			msg.awaitMessageComponent({ filter: skipFilter, time: 43_200_000 })

@@ -1,7 +1,6 @@
 const { Actions } = require('@database');
 
 async function listCommand(interaction, currentForm) {
-	// TODO: add pagination and embeds
 	const actions = await Actions.findAll({ where: { form_channel_id: currentForm.form_channel_id } });
 	if (actions.length === 0) {
 		await interaction.reply({ content: 'There are no actions configured for this form!', ephemeral: true });

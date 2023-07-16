@@ -150,6 +150,7 @@ module.exports = {
 		}
 
 		if (subcommand === 'remove') {
+			// autocomplete question ID for remove subcommand
 			const questions = await currentForm.getQuestions();
 			const focusedValue = interaction.options.getFocused();
 			const filtered = questions.filter(question => {

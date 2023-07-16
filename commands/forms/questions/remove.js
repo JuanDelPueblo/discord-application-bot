@@ -16,12 +16,14 @@ async function removeCommand(interaction, currentForm) {
 		return;
 	}
 
+	// get confirmation as to whenether the user wants to remove the question or not
 	const confirmationMsg = await interaction.reply(questionRemoveEmbed(questionToRemove));
 	const filter = i => i.user.id === interaction.user.id;
 	const response = await confirmationMsg.awaitMessageComponent({ filter, time: 43_200_000 });
 
 	if (response.customId.startsWith('cancel-remove-question-')) return response.update({ content: 'Question removal cancelled.', components: [], embeds: [] });
 
+	// update the order of the questions
 	const removedOrder = questionToRemove.order;
 	for (let i = removedOrder; i < questions.length; i++) {
 		questions[i].order = questions[i].order - 1;

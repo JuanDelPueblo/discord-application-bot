@@ -3,6 +3,7 @@ const { DataTypes } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
 
+// load models from subfolders and register them
 function registerModels(sequelize, rootDir) {
 	return new Promise((resolve, reject) => {
 		try {
@@ -24,6 +25,7 @@ function registerModels(sequelize, rootDir) {
 	});
 }
 
+// initialize the database
 module.exports = (rootDir) => {
 	return new Promise((resolve, reject) => {
 		try {

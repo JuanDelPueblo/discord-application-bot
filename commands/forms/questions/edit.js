@@ -10,6 +10,7 @@ async function editCommand(interaction, currentForm) {
 		return;
 	}
 
+	// get the question title and description via a modal
 	await editQuestionModal(interaction);
 	const modalFilter = i => i.customId.startsWith(`edit_question-${interaction.channel.id}`);
 	const modalInteraction = await interaction.awaitModalSubmit({ time: 43_200_000, modalFilter })
@@ -41,6 +42,7 @@ async function editCommand(interaction, currentForm) {
 			break;
 		}
 		case 'select': {
+			// get the options via a collector
 			const filter = m => m.author.id === modalInteraction.user.id;
 			const collector = interaction.channel.createMessageCollector({ filter, time: 43_200_000 });
 
@@ -57,6 +59,7 @@ async function editCommand(interaction, currentForm) {
 			collector.on('end', async (collected) => {
 				const options = [];
 
+				// add all the options to the array except for the !done message and those with a 👎 reaction
 				for (const message of collected.values()) {
 					const reaction = await message.reactions.cache.get('👎');
 
@@ -69,7 +72,7 @@ async function editCommand(interaction, currentForm) {
 					}
 				}
 
-				if (options.length < 2) {
+				if (options.length < 1) {
 					return modalInteraction.followUp({ content: 'You must have at least 2 options!', ephemeral: true });
 				}
 
@@ -81,8 +84,6 @@ async function editCommand(interaction, currentForm) {
 					options: options,
 				});
 				await modalInteraction.followUp({ content: 'This question has been updated!', ephemeral: true });
-				const choices = options.map((option, index) => `${index + 1}. ${option}`).join('\n');
-				await modalInteraction.followUp({ content: `**Choices:**\n${choices}`, ephemeral: true });
 			});
 
 

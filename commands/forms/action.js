@@ -199,6 +199,7 @@ module.exports = {
 		}
 
 		if (subcommand === 'remove') {
+			// autocomplete action names
 			const actions = await currentForm.getActions();
 			const focusedValue = interaction.options.getFocused();
 			const filtered = actions.filter(action => action.name.startsWith(focusedValue)).slice(0, 25);

@@ -11,6 +11,7 @@ async function moveCommand(interaction, currentForm) {
 		return;
 	}
 
+	// swap the order of the questions
 	await interaction.deferReply({ ephemeral: true });
 	try {
 		await questionAtPosition.update({
