@@ -149,8 +149,8 @@ module.exports = {
 			return await interaction.respond([]);
 		}
 
-		if (subcommand === 'remove') {
-			// autocomplete question ID for remove subcommand
+		if (subcommand === 'remove' || subcommand === 'edit') {
+			// autocomplete question ID for remove and edit subcommands
 			const questions = await currentForm.getQuestions();
 			const focusedValue = interaction.options.getFocused();
 			const filtered = questions.filter(question => {
