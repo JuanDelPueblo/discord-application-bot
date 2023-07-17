@@ -147,7 +147,6 @@ module.exports = {
 						}
 						}
 					}
-					await thread.setLocked(true);
 					await thread.send(formSubmittedEmbed(thread, rolePermissions));
 					await application.update({
 						submitted: true,
@@ -232,40 +231,6 @@ module.exports = {
 					} else {
 						await application.destroy();
 					}
-				} catch (error) {
-					console.error(error);
-					await interaction.reply({ content: 'An error occurred while processing your request.', ephemeral: true });
-				}
-			} else if (button.startsWith('lock-')) {
-				try {
-					const form = await Forms.findOne({
-						where: { form_channel_id: interaction.channel.parentId },
-					});
-					if (form === null) {
-						return interaction.reply({ content: 'Unable to find form for this application.', ephemeral: true });
-					}
-
-					// check if the user has permission to lock or unlock applications for discussion
-					const rolePermissions = await form.getRoles();
-					const roles = await Promise.all(rolePermissions
-						.filter(r => r.permission === 'action')
-						.map(async role => await interaction.guild.roles.fetch(role.role_id)));
-					const member = await interaction.guild.members.fetch(interaction.user.id);
-					let hasPermission = false;
-					for (const role of roles) {
-						if (role === undefined) continue;
-						if (member.roles.cache.some(r => r.name === role.name)) {
-							hasPermission = true;
-						}
-					}
-					if (!hasPermission) {
-						await interaction.deferUpdate();
-						return;
-					}
-
-					const thread = await interaction.guild.channels.fetch(button.split('-')[1]);
-					await thread.setLocked(!thread.locked);
-					await interaction.reply({ content: `This application has been ${thread.locked ? 'locked' : 'unlocked'}.`, ephemeral: true });
 				} catch (error) {
 					console.error(error);
 					await interaction.reply({ content: 'An error occurred while processing your request.', ephemeral: true });

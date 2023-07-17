@@ -89,13 +89,8 @@ module.exports = {
 			.setLabel('Deny')
 			.setStyle(ButtonStyle.Danger);
 
-		const lockButton = new ButtonBuilder()
-			.setCustomId(`lock-${thread.id}`)
-			.setLabel('Toggle lock')
-			.setStyle(ButtonStyle.Secondary);
-
 		const buttonRow = new ActionRowBuilder()
-			.addComponents(approveButton, denyButton, lockButton);
+			.addComponents(approveButton, denyButton);
 
 		let roleMentionsMsg = '';
 		if (rolePermissions.length > 0) {
