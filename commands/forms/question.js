@@ -18,7 +18,8 @@ module.exports = {
 				.addIntegerOption(option =>
 					option.setName('id')
 						.setDescription('The question id')
-						.setRequired(true),
+						.setRequired(true)
+						.setAutocomplete(true),
 				),
 		)
 		.addSubcommand(subcommand =>
