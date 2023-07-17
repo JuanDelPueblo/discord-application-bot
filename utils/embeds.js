@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, roleMention } = require('discord.js');
 const { color } = require('@config');
 
 module.exports = {
@@ -73,7 +73,7 @@ module.exports = {
 
 		return { embeds: [embed], components: [row, row2] };
 	},
-	formSubmittedEmbed(thread) {
+	formSubmittedEmbed(thread, rolePermissions) {
 		const embed = new EmbedBuilder()
 			.setColor(color)
 			.setTitle('Form submitted!')
@@ -97,7 +97,16 @@ module.exports = {
 		const buttonRow = new ActionRowBuilder()
 			.addComponents(approveButton, denyButton, lockButton);
 
-		return { embeds: [embed], components: [buttonRow] };
+		let roleMentionsMsg = '';
+		if (rolePermissions.length > 0) {
+			for (const rolePermission of rolePermissions) {
+				if (rolePermission.permission === 'action' || rolePermission.permission === 'view') {
+					roleMentionsMsg += `${roleMention(rolePermission.role_id)} `;
+				}
+			}
+		}
+
+		return { content: roleMentionsMsg, embeds: [embed], components: [buttonRow] };
 	},
 	formFinishedEmbed(approved) {
 		const embed = new EmbedBuilder()

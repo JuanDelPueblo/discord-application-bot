@@ -148,7 +148,7 @@ module.exports = {
 						}
 					}
 					await thread.setLocked(true);
-					await thread.send(formSubmittedEmbed(thread));
+					await thread.send(formSubmittedEmbed(thread, rolePermissions));
 					await application.update({
 						submitted: true,
 						submitted_at: new Date(),
