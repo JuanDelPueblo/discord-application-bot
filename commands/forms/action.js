@@ -134,7 +134,7 @@ module.exports = {
 						)
 						.addStringOption(option =>
 							option.setName('message')
-								.setDescription('The message to send')
+								.setDescription('The message to send (use {user} to mention the user)')
 								.setRequired(true),
 						),
 				)

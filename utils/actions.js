@@ -1,3 +1,5 @@
+const { userMention } = require('discord.js');
+
 async function executeAction(interaction, member, action) {
 	try {
 		switch (action.do) {
@@ -39,7 +41,8 @@ async function executeAction(interaction, member, action) {
 				await interaction.followUp({ content: 'The channel for this action no longer exists!', ephemeral: true });
 				return;
 			}
-			await channel.send(action.message);
+			const message = action.message.replace(/{user}/g, userMention(member.user.id));
+			await channel.send(message);
 			break;
 		}
 		case 'sendmessagedm': {
