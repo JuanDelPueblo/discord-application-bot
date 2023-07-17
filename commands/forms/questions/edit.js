@@ -30,11 +30,9 @@ async function editCommand(interaction, currentForm) {
 		case 'number':
 		case 'fileupload': {
 			await existingQuestion.update({
-				form_channel_id: currentForm.form_channel_id,
-				question_id: id,
 				title: questionTitle,
 				description: questionDescription,
-			});
+			}, { where: { form_channel_id: currentForm.form_channel_id, question_id: id } });
 
 			await modalInteraction.reply({ content: 'This question has been updated!', ephemeral: true });
 
@@ -76,12 +74,10 @@ async function editCommand(interaction, currentForm) {
 				}
 
 				await Questions.update({
-					form_channel_id: currentForm.form_channel_id,
-					question_id: id,
 					title: questionTitle,
 					description: questionDescription,
 					options: options,
-				});
+				}, { where: { form_channel_id: currentForm.form_channel_id, question_id: id } });
 				await modalInteraction.followUp({ content: 'This question has been updated!', ephemeral: true });
 			});
 
