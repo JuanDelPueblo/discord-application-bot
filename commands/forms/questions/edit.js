@@ -24,7 +24,6 @@ async function editCommand(interaction, currentForm) {
 	const questionDescription = modalInteraction.fields.getTextInputValue(`question_description-${interaction.channel.id}`) ?? '';
 	const type = existingQuestion.type;
 
-	await interaction.deferReply({ ephemeral: true });
 	try {
 		switch (type) {
 		case 'text':
