@@ -102,7 +102,7 @@ module.exports = {
 							const response = await textQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
 							if (response === undefined && question.required) {
-								const updatedThread = interaction.guild.channels.fetch(thread.id);
+								const updatedThread = await interaction.guild.channels.fetch(thread.id);
 								if (updatedThread) {
 									updatedThread.delete();
 								}
@@ -122,7 +122,7 @@ module.exports = {
 							const response = await numberQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
 							if (response === undefined && question.required) {
-								const updatedThread = interaction.guild.channels.fetch(thread.id);
+								const updatedThread = await interaction.guild.channels.fetch(thread.id);
 								if (updatedThread) {
 									updatedThread.delete();
 								}
@@ -142,7 +142,7 @@ module.exports = {
 							const response = await selectQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
 							if (response === undefined && question.required) {
-								const updatedThread = interaction.guild.channels.fetch(thread.id);
+								const updatedThread = await interaction.guild.channels.fetch(thread.id);
 								if (updatedThread) {
 									updatedThread.delete();
 								}
@@ -162,7 +162,7 @@ module.exports = {
 							const response = await fileUploadQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
 							if (response === undefined && question.required) {
-								const updatedThread = interaction.guild.channels.fetch(thread.id);
+								const updatedThread = await interaction.guild.channels.fetch(thread.id);
 								if (updatedThread) {
 									updatedThread.delete();
 								}
@@ -190,6 +190,9 @@ module.exports = {
 						submitted_at: new Date(),
 					});
 				} catch (error) {
+					if (error.message === 'Unknown Channel') {
+						return interaction.followUp({ content: 'Your application has been deleted either manually or due to inactivity.', ephemeral: true });
+					}
 					console.error(error);
 					return interaction.followUp({ content: 'Unable to create application thread.', ephemeral: true });
 				}

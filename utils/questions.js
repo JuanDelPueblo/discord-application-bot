@@ -20,7 +20,13 @@ async function textQuestionCollector(interaction, thread, question) {
 						questionSkipped = true;
 						collector.stop();
 					})
-					.catch(console.error);
+					.catch(err => {
+						if (err.message === 'Collector received no interactions before ending with reason: threadDelete'
+							|| err.message === 'Collector received no interactions before ending with reason: time') {
+							return;
+						}
+						console.log(err);
+					});
 
 				const collector = thread.createMessageCollector({ filter, max: 1, time: 43_200_000 });
 
@@ -50,6 +56,10 @@ async function textQuestionCollector(interaction, thread, question) {
 				});
 			});
 		} catch (err) {
+			if (err.message === 'Unknown Channel') {
+				resolve(undefined);
+				return;
+			}
 			console.log(err);
 			reject(err);
 		}
@@ -77,7 +87,13 @@ async function numberQuestionCollector(interaction, thread, question) {
 						questionSkipped = true;
 						collector.stop();
 					})
-					.catch(console.error);
+					.catch(err => {
+						if (err.message === 'Collector received no interactions before ending with reason: threadDelete'
+							|| err.message === 'Collector received no interactions before ending with reason: time') {
+							return;
+						}
+						console.log(err);
+					});
 
 				const collector = thread.createMessageCollector({ filter, max: 1, time: 43_200_000 });
 
@@ -118,6 +134,10 @@ async function numberQuestionCollector(interaction, thread, question) {
 				});
 			});
 		} catch (err) {
+			if (err.message === 'Unknown Channel') {
+				resolve(undefined);
+				return;
+			}
 			console.log(err);
 			reject(err);
 		}
@@ -130,7 +150,7 @@ async function selectQuestionCollector(interaction, thread, question) {
 		thread.send(embed)
 			.then(async msg => {
 				const selectFilter = i => i.user.id === interaction.user.id;
-				const selection = await msg.awaitMessageComponent({ selectFilter, time: 60_00 }); // 43_200_000
+				const selection = await msg.awaitMessageComponent({ selectFilter, time: 43_200_000 });
 				await selection.deferUpdate();
 				if (selection.customId.startsWith('skip-')) {
 					await thread.send({ content: 'Question skipped.' });
@@ -148,6 +168,8 @@ async function selectQuestionCollector(interaction, thread, question) {
 					}
 					resolve(undefined);
 				} else if (err.message === 'Collector received no interactions before ending with reason: threadDelete') {
+					resolve(undefined);
+				} else if (err.message === 'Unknown Channel') {
 					resolve(undefined);
 				}
 				console.log(err);
@@ -176,7 +198,13 @@ async function fileUploadQuestionCollector(interaction, thread, question) {
 						questionSkipped = true;
 						collector.stop();
 					})
-					.catch(console.error);
+					.catch(err => {
+						if (err.message === 'Collector received no interactions before ending with reason: threadDelete'
+							|| err.message === 'Collector received no interactions before ending with reason: time') {
+							return;
+						}
+						console.log(err);
+					});
 
 				const collector = thread.createMessageCollector({ filter, max: 1, time: 43_200_000 });
 
@@ -213,6 +241,10 @@ async function fileUploadQuestionCollector(interaction, thread, question) {
 				});
 			});
 		} catch (err) {
+			if (err.message === 'Unknown Channel') {
+				resolve(undefined);
+				return;
+			}
 			console.log(err);
 			reject(err);
 		}
