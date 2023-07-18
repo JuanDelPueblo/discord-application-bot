@@ -154,7 +154,7 @@ module.exports = {
 					});
 				} catch (error) {
 					console.error(error);
-					return interaction.reply({ content: 'Unable to create application thread.', ephemeral: true });
+					return interaction.followUp({ content: 'Unable to create application thread.', ephemeral: true });
 				}
 			} else if (button.startsWith('approve-') || button.startsWith('deny-')) { // approve or deny an application
 				try {
