@@ -5,6 +5,7 @@ const { editCommand } = require('./form/edit.js');
 const { eraseCommand } = require('./form/erase.js');
 const { submitCommand } = require('./form/submit.js');
 const { exportCommand } = require('./form/export.js');
+const { setMaxCommand } = require('./form/setmax.js');
 
 module.exports = {
 	cooldown: 3,
@@ -40,6 +41,15 @@ module.exports = {
 		.addSubcommand(subcommand =>
 			subcommand.setName('list')
 				.setDescription('Lists all forms and their respective channels'),
+		)
+		.addSubcommand(subcommand =>
+			subcommand.setName('setmax')
+				.setDescription('Sets the maximum number of applications per applicant')
+				.addIntegerOption(option =>
+					option.setName('max')
+						.setDescription('Max number of applications per applicant (default: No limit)')
+						.setMinValue(1),
+				),
 		),
 	async execute(interaction) {
 		const subcommand = await interaction.options.getSubcommand();
@@ -83,6 +93,10 @@ module.exports = {
 				const formsList = forms.map(form => `${channelMention(form.form_channel_id)} - ${form.title}`);
 				await interaction.reply({ content: formsList.join('\n'), ephemeral: true });
 			}
+			break;
+		}
+		case 'setmax': {
+			await setMaxCommand(interaction, currentForm);
 			break;
 		}
 		default: {

@@ -54,9 +54,18 @@ module.exports = {
 					const form = await Forms.findOne({
 						where: { form_channel_id: formChannelId },
 					});
+
 					if (!form.enabled) {
 						return interaction.reply({ content: 'This form is currently not open for submissions.', ephemeral: true });
 					}
+
+					if (form.max) {
+						const applications = await form.getApplications({ where: { form_channel_id: formChannelId, user_id: interaction.user.id } });
+						if (applications.length >= form.max) {
+							return interaction.reply({ content: `You cannot submit more than ${form.max} applications at a time!`, ephemeral: true });
+						}
+					}
+
 					await interaction.deferUpdate();
 
 					const thread = await interaction.channel.threads.create({
@@ -92,7 +101,13 @@ module.exports = {
 						case 'text': {
 							const response = await textQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
-							if (response === undefined && question.required) return thread.delete();
+							if (response === undefined && question.required) {
+								const updatedThread = interaction.guild.channels.fetch(thread.id);
+								if (updatedThread) {
+									updatedThread.delete();
+								}
+								return;
+							}
 							await Answers.create({
 								thread_id: thread.id,
 								question_id: question.question_id,
@@ -106,7 +121,13 @@ module.exports = {
 						case 'number': {
 							const response = await numberQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
-							if (response === undefined && question.required) return thread.delete();
+							if (response === undefined && question.required) {
+								const updatedThread = interaction.guild.channels.fetch(thread.id);
+								if (updatedThread) {
+									updatedThread.delete();
+								}
+								return;
+							}
 							await Answers.create({
 								thread_id: thread.id,
 								question_id: question.question_id,
@@ -120,7 +141,13 @@ module.exports = {
 						case 'select': {
 							const response = await selectQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
-							if (response === undefined && question.required) return thread.delete();
+							if (response === undefined && question.required) {
+								const updatedThread = interaction.guild.channels.fetch(thread.id);
+								if (updatedThread) {
+									updatedThread.delete();
+								}
+								return;
+							}
 							await Answers.create({
 								thread_id: thread.id,
 								question_id: question.question_id,
@@ -134,7 +161,13 @@ module.exports = {
 						case 'fileupload': {
 							const response = await fileUploadQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
-							if (response === undefined && question.required) return thread.delete();
+							if (response === undefined && question.required) {
+								const updatedThread = interaction.guild.channels.fetch(thread.id);
+								if (updatedThread) {
+									updatedThread.delete();
+								}
+								return;
+							}
 							await Answers.create({
 								thread_id: thread.id,
 								question_id: question.question_id,

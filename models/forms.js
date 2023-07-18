@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: false,
 			defaultValue: false,
 		},
+		max: { // the max number of applications per applicant
+			type: DataTypes.INTEGER,
+			allowNull: true,
+		},
 	}, {
 		sequelize,
 		tableName: 'forms',

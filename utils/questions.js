@@ -37,9 +37,8 @@ async function textQuestionCollector(interaction, thread, question) {
 						return;
 					}
 					if (collected.size === 0) {
-						const updatedThread = interaction.guild.channels.fetch(thread.id);
-						if (updatedThread) {
-							await updatedThread.send({ content: 'No response given in time.', ephemeral: true });
+						if (collector.endReason !== 'threadDelete') {
+							await thread.send({ content: 'No response given in time.', ephemeral: true });
 						}
 						resolve(undefined);
 						return;
@@ -106,9 +105,8 @@ async function numberQuestionCollector(interaction, thread, question) {
 						return;
 					}
 					if (collected.size === 0) {
-						const updatedThread = interaction.guild.channels.fetch(thread.id);
-						if (updatedThread) {
-							await updatedThread.send({ content: 'No response given in time.', ephemeral: true });
+						if (collector.endReason !== 'threadDelete') {
+							await thread.send({ content: 'No response given in time.', ephemeral: true });
 						}
 						resolve(undefined);
 						return;
@@ -144,10 +142,12 @@ async function selectQuestionCollector(interaction, thread, question) {
 			})
 			.catch(async err => {
 				if (err.message === 'Collector received no interactions before ending with reason: time') {
-					const updatedThread = interaction.guild.channels.fetch(thread.id);
+					const updatedThread = await interaction.guild.channels.fetch(thread.id);
 					if (updatedThread) {
 						await updatedThread.send({ content: 'No response given in time.', ephemeral: true });
 					}
+					resolve(undefined);
+				} else if (err.message === 'Collector received no interactions before ending with reason: threadDelete') {
 					resolve(undefined);
 				}
 				console.log(err);
@@ -195,9 +195,8 @@ async function fileUploadQuestionCollector(interaction, thread, question) {
 						return;
 					}
 					if (collected.size === 0) {
-						const updatedThread = interaction.guild.channels.fetch(thread.id);
-						if (updatedThread) {
-							await updatedThread.send({ content: 'No response given in time.', ephemeral: true });
+						if (collector.endReason !== 'threadDelete') {
+							await thread.send({ content: 'No response given in time.', ephemeral: true });
 						}
 						resolve(undefined);
 						return;
