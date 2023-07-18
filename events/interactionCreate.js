@@ -92,6 +92,7 @@ module.exports = {
 						case 'text': {
 							const response = await textQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
+							if (response === undefined && question.required) return thread.delete();
 							await Answers.create({
 								thread_id: thread.id,
 								question_id: question.question_id,
@@ -105,6 +106,7 @@ module.exports = {
 						case 'number': {
 							const response = await numberQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
+							if (response === undefined && question.required) return thread.delete();
 							await Answers.create({
 								thread_id: thread.id,
 								question_id: question.question_id,
@@ -118,6 +120,7 @@ module.exports = {
 						case 'select': {
 							const response = await selectQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
+							if (response === undefined && question.required) return thread.delete();
 							await Answers.create({
 								thread_id: thread.id,
 								question_id: question.question_id,
@@ -131,6 +134,7 @@ module.exports = {
 						case 'fileupload': {
 							const response = await fileUploadQuestionCollector(interaction, thread, question);
 							if (response === undefined) break;
+							if (response === undefined && question.required) return thread.delete();
 							await Answers.create({
 								thread_id: thread.id,
 								question_id: question.question_id,
