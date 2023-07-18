@@ -17,26 +17,18 @@ function main() {
 
 	client.commands = new Collection();
 	client.cooldowns = new Collection();
-	const foldersPath = path.join(__dirname, 'commands');
-	let commandFolders = fs.readdirSync(foldersPath);
 
-	// load commands from subfolders into the collection
-	commandFolders = commandFolders.filter((folder) => {
-		const folderPath = path.resolve(foldersPath, folder);
-		return fs.lstatSync(folderPath).isDirectory();
-	});
+	// load commands from the commands folder into the collection
+	const commandPath = path.join(__dirname, 'commands');
+	const commandFiles = fs.readdirSync(commandPath).filter(file => file.endsWith('.js'));
 
-	for (const folder of commandFolders) {
-		const commandsPath = path.join(foldersPath, folder);
-		const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-		for (const file of commandFiles) {
-			const filePath = path.join(commandsPath, file);
-			const command = require(filePath);
-			if ('data' in command && 'execute' in command) {
-				client.commands.set(command.data.name, command);
-			} else {
-				console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-			}
+	for (const file of commandFiles) {
+		const filePath = path.join(commandPath, file);
+		const command = require(filePath);
+		if ('data' in command && 'execute' in command) {
+			client.commands.set(command.data.name, command);
+		} else {
+			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
 		}
 	}
 
