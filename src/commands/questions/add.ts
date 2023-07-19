@@ -92,7 +92,7 @@ export default async function addCommand(interaction, currentForm, type) {
 			});
 
 			collector.on('end', async (collected) => {
-				const options = [];
+				const options: string[] = [];
 
 				// add all the options to the array except for the !done message and those with a 👎 reaction
 				for (const message of collected.values()) {

@@ -30,8 +30,8 @@ export function questionEmbed(thread, question) {
 		.addFields({ name: 'Question Type', value: type, inline: true });
 	if (question.description) embed.setDescription(question.description);
 	const unit = type === 'Text' ? 'characters' : type === 'Number' ? 'value' : 'attachments';
-	if (!isNaN(question.min)) embed.addFields({ name: `Minimum ${unit}`, value: `${question.min}`, inline: true });
-	if (!isNaN(question.max)) embed.addFields({ name: `Maximum ${unit}`, value: `${question.max}`, inline: true });
+	if (!isNaN(question.min) && question.min !== null) embed.addFields({ name: `Minimum ${unit}`, value: `${question.min}`, inline: true });
+	if (!isNaN(question.max) && question.max !== null) embed.addFields({ name: `Maximum ${unit}`, value: `${question.max}`, inline: true });
 
 	if (question.required)	return { embeds: [embed] };
 

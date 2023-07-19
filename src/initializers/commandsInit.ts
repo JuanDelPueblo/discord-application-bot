@@ -1,12 +1,12 @@
-import { REST, Routes } from 'discord.js';
+import { REST, Routes, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 
 // load commands from subfolders into an array
 async function loadCommands(rootDir) {
-	const commands = [];
+	const commands: Object[] = [];
 	const commandPath = path.join(rootDir, 'commands');
-	const commandFiles = fs.readdirSync(commandPath).filter(file => file.endsWith('.js'));
+	const commandFiles = fs.readdirSync(commandPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
 
 	for (const file of commandFiles) {
 		const filePath = path.join(commandPath, file);
@@ -30,9 +30,9 @@ export default (rootDir, clientId, token) => {
 
 					console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-					return rest.put(Routes.applicationCommands(clientId), { body: commands });
+					return rest.put(Routes.applicationCommands(clientId), { body: commands }) as Promise<RESTPostAPIChatInputApplicationCommandsJSONBody[]>;
 				})
-				.then(data => {
+				.then((data) => {
 					console.log(`Successfully reloaded ${data.length} application (/) commands.`);
 					resolve(data);
 				});

@@ -26,16 +26,15 @@ export function editFormModal(interaction) {
 		.setPlaceholder('New Application')
 		.setStyle(TextInputStyle.Short);
 
-	const titleRow = new ActionRowBuilder()
+	const titleRow = new ActionRowBuilder<TextInputBuilder>()
 		.addComponents(formTitleInput);
 
-	const descriptionRow = new ActionRowBuilder()
+	const descriptionRow = new ActionRowBuilder<TextInputBuilder>()
 		.addComponents(formDescriptionInput);
 
-	const buttonTextRow = new ActionRowBuilder()
+	const buttonTextRow = new ActionRowBuilder<TextInputBuilder>()
 		.addComponents(formButtonTextInput);
 
-	// @ts-ignore
 	modal.addComponents(titleRow, descriptionRow, buttonTextRow);
 
 	return interaction.showModal(modal);
@@ -59,13 +58,12 @@ export function editQuestionModal(interaction) {
 		.setLabel('Question Description')
 		.setStyle(TextInputStyle.Paragraph);
 
-	const titleRow = new ActionRowBuilder()
+	const titleRow = new ActionRowBuilder<TextInputBuilder>()
 		.addComponents(questionTitleInput);
 
-	const descriptionRow = new ActionRowBuilder()
+	const descriptionRow = new ActionRowBuilder<TextInputBuilder>()
 		.addComponents(questionDescriptionInput);
 
-	// @ts-ignore
 	modal.addComponents(titleRow, descriptionRow);
 
 	return interaction.showModal(modal);

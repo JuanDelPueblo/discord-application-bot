@@ -2,10 +2,10 @@
   "name": "discord-application-bot",
   "version": "1.0.0",
   "description": "A Discord Bot for accepting or rejecting users based on their form submissions",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/index.js"
+    "start": "ts-node --esm src/index.ts"
   },
   "repository": {
     "type": "git",

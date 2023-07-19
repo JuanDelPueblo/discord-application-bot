@@ -8,7 +8,7 @@ async function registerModels(sequelize, rootDir) {
 	const files = await fs.promises.readdir(modelsPath);
 
 	for (const file of files) {
-		if (file.endsWith('.js')) {
+		if (file.endsWith('.js') || file.endsWith('.ts')) {
 			const filePath = path.resolve(modelsPath, file);
 			const modelModule = await import(filePath);
 			const modelFunction = modelModule.default || modelModule; // Handle default exports if available

@@ -14,7 +14,7 @@ async function registerEvents(client) {
 	try {
 		const eventFiles = readdirSync(eventsPath);
 		for (const file of eventFiles) {
-			if (file.endsWith('.js')) {
+			if (file.endsWith('.js') || file.endsWith('.ts')) {
 				const filePath = join(eventsPath, file);
 				const event = await import(pathToFileURL(filePath).toString());
 				if (event.once) {

@@ -15,7 +15,7 @@ export default async function exportCommand(interaction, currentForm) {
 	const questions = await currentForm.getQuestions({ order: [['order', 'ASC']] });
 
 	// create the CSV data from the applications to export
-	const csvData = [];
+	const csvData: Object[] = [];
 	for (const application of applications.filter(app => app.submitted)) {
 		const member = interaction.guild.members.cache.get(application.user_id);
 		const username = member ? member.user.username : application.user_id;
