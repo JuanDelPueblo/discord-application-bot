@@ -2,10 +2,10 @@
   "name": "discord-application-bot",
   "version": "1.0.0",
   "description": "A Discord Bot for accepting or rejecting users based on their form submissions",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "ts-node src/index.js"
   },
   "repository": {
     "type": "git",
@@ -26,23 +26,19 @@
     "url": "https://github.com/JuanDelPueblo/discord-application-bot/issues"
   },
   "homepage": "https://github.com/JuanDelPueblo/discord-application-bot#readme",
+  "type": "module",
   "dependencies": {
     "@json2csv/plainjs": "^7.0.1",
+    "discord-api-types": "^0.37.49",
     "discord.js": "^14.11.0",
-    "module-alias": "^2.2.3",
     "sequelize": "^6.32.0",
+    "sequelize-typescript": "^2.1.5",
     "sqlite3": "^5.1.6"
   },
-  "_moduleAliases": {
-    "@root": ".",
-    "@commands": "commands",
-    "@events": "events",
-    "@models": "models",
-    "@utils": "utils",
-    "@config": "config.json",
-    "@database": "database.js"
-  },
   "devDependencies": {
-    "eslint": "^8.43.0"
+    "@types/eslint": "^8.44.0",
+    "eslint": "^8.43.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
   }
 }

@@ -1,4 +1,6 @@
-node_modules
+node_modules/
 config.json
 database.sqlite
-data
+data/
+bin/
+tsconfig.tsbuildinfo
