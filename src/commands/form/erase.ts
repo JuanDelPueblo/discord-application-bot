@@ -1,7 +1,7 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Message } from 'discord.js';
 import { Questions, Actions, Roles, Applications } from '../../database.js';
 
-export default async function eraseCommand(interaction, currentForm) {
+export default async function eraseCommand(interaction: ChatInputCommandInteraction, currentForm: any) {
 	const confirm = new ButtonBuilder()
 		.setCustomId(`erase-${currentForm.form_channel_id}`)
 		.setLabel('Erase Form')
@@ -12,7 +12,7 @@ export default async function eraseCommand(interaction, currentForm) {
 		.setLabel('Cancel')
 		.setStyle(ButtonStyle.Secondary);
 
-	const row = new ActionRowBuilder()
+	const row = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(cancel, confirm);
 
 	const response = await interaction.reply({
@@ -21,14 +21,14 @@ export default async function eraseCommand(interaction, currentForm) {
 		ephemeral: true,
 	});
 
-	const filter = i => i.user.id === interaction.user.id;
+	const filter = (i: BaseInteraction) => i.user.id === interaction.user.id;
 
 	try {
 		const confirmation = await response.awaitMessageComponent({ filter: filter, time: 43_200_000 });
 
 		if (confirmation.customId.startsWith('erase-')) {
 			// delete the form embed
-			await interaction.channel.messages.fetch(currentForm.embed_message_id).then(msg => msg.delete());
+			await interaction.channel!.messages.fetch(currentForm.embed_message_id).then((msg: Message) => msg.delete());
 			// destroy everything related to the form by hand
 			const questions = await Questions.findAll({
 				where: { form_channel_id: currentForm.form_channel_id },

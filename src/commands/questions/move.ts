@@ -1,6 +1,7 @@
+import { ChatInputCommandInteraction } from 'discord.js';
 import { Questions } from '../../database.js';
 
-export default async function moveCommand(interaction, currentForm) {
+export default async function moveCommand(interaction: ChatInputCommandInteraction, currentForm: any) {
 	const id = interaction.options.getInteger('id');
 	const position = interaction.options.getInteger('position');
 

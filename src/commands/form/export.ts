@@ -1,8 +1,9 @@
 import { Parser } from '@json2csv/plainjs';
 import { Answers } from '../../database.js';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { ChatInputCommandInteraction } from 'discord.js';
 
-export default async function exportCommand(interaction, currentForm) {
+export default async function exportCommand(interaction: ChatInputCommandInteraction, currentForm: any) {
 	const applications = await currentForm.getApplications();
 
 	if (applications.length === 0) {
@@ -16,17 +17,17 @@ export default async function exportCommand(interaction, currentForm) {
 
 	// create the CSV data from the applications to export
 	const csvData: Object[] = [];
-	for (const application of applications.filter(app => app.submitted)) {
-		const member = interaction.guild.members.cache.get(application.user_id);
+	for (const application of applications.filter((app: any) => app.submitted)) {
+		const member = interaction.guild!.members.cache.get(application.user_id);
 		const username = member ? member.user.username : application.user_id;
-		await Answers.findAll({ where: { thread_id: application.thread_id } }).then(answers => {
-			const applicationData = {
+		await Answers.findAll({ where: { thread_id: application.thread_id } }).then((answers: any) => {
+			const applicationData: any = {
 				'Username': username,
 				'Submitted at': application.submitted_at,
 				'Approved': application.approved,
 			};
 			for (const question of questions) {
-				const answer = answers.find(a => a.question_id === question.question_id);
+				const answer = answers.find((a: any) => a.question_id === question.question_id);
 				applicationData[question.title] = answer ? answer.answer.content : '';
 			}
 			csvData.push(applicationData);

@@ -3,7 +3,7 @@ import { join } from 'path';
 import dbInit from './dbInit.js';
 import commandsInit from './commandsInit.js';
 
-export default (rootDir) => {
+export default (rootDir: string) => {
 	return new Promise((resolve, reject) => {
 		const configFilePath = join(rootDir, 'config.json');
 

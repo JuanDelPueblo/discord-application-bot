@@ -1,6 +1,7 @@
+import { BaseInteraction, Message, ThreadChannel } from 'discord.js';
 import { questionEmbed, selectQuestionEmbed } from './embeds.js';
 
-export async function textQuestionCollector(interaction, thread, question) {
+export async function textQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: any) {
 	return new Promise((resolve, reject) => {
 		try {
 			const embed = questionEmbed(thread, question);
@@ -8,12 +9,12 @@ export async function textQuestionCollector(interaction, thread, question) {
 				const min = question.min ?? 1;
 				const max = question.max ?? 2000;
 
-				const filter = m => {
+				const filter = (m: Message) => {
 					return m.author.id === interaction.user.id && (m.content.length >= min && m.content.length <= max);
 				};
 
 				let questionSkipped = false;
-				const skipFilter = i => i.user.id === interaction.user.id;
+				const skipFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
 				msg.awaitMessageComponent({ filter: skipFilter, time: 43_200_000 })
 					.then(i => {
 						i.deferUpdate();
@@ -32,7 +33,7 @@ export async function textQuestionCollector(interaction, thread, question) {
 
 				collector.on('ignore', async m => {
 					if ((m.content.length < min || m.content.length > max) && m.author.id === interaction.user.id) {
-						await thread.send({ content: `Your response must be between ${min} and ${max} characters long. Please answer again.`, ephemeral: true });
+						await thread.send({ content: `Your response must be between ${min} and ${max} characters long. Please answer again.` });
 					}
 				});
 
@@ -44,14 +45,14 @@ export async function textQuestionCollector(interaction, thread, question) {
 					}
 					if (collected.size === 0) {
 						if (collector.endReason !== 'threadDelete') {
-							await thread.send({ content: 'No response given in time.', ephemeral: true });
+							await thread.send({ content: 'No response given in time.' });
 						}
 						resolve(undefined);
 						return;
 					}
 
-					const response = collected.first().content;
-					await thread.send({ content: `Your response was: ${response}`, ephemeral: true });
+					const response = collected.first()!.content;
+					await thread.send({ content: `Your response was: ${response}`});
 					resolve(response);
 				});
 			});
@@ -66,21 +67,19 @@ export async function textQuestionCollector(interaction, thread, question) {
 	});
 }
 
-export async function numberQuestionCollector(interaction, thread, question) {
+export async function numberQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: any) {
 	return new Promise((resolve, reject) => {
 		try {
 			const embed = questionEmbed(thread, question);
 			thread.send(embed).then(msg => {
-				const filter = m => {
+				const filter = (m: Message) => {
 					const value = parseInt(m.content);
-					if (m.author.id === interaction.user.id) {
-						if (isNaN(value)) return false;
-						return (question.min ? (value >= question.min) : true) && (question.max ? (value <= question.max) : true);
-					}
+					if (isNaN(value)) return false;
+					return (question.min ? (value >= question.min) : true) && (question.max ? (value <= question.max) : true);
 				};
 
 				let questionSkipped = false;
-				const skipFilter = i => i.user.id === interaction.user.id;
+				const skipFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
 				msg.awaitMessageComponent({ filter: skipFilter, time: 43_200_000 })
 					.then(i => {
 						i.deferUpdate();
@@ -101,15 +100,15 @@ export async function numberQuestionCollector(interaction, thread, question) {
 					const value = parseInt(m.content);
 					if (m.author.id === interaction.user.id) {
 						if (isNaN(value)) {
-							await thread.send({ content: 'Your response must be a number. Please answer again.', ephemeral: true });
+							await thread.send({ content: 'Your response must be a number. Please answer again.' });
 						} else if (question.min && question.max) {
 							if (value < question.min || value > question.max) {
-								await thread.send({ content: `Your response must be between ${question.min} and ${question.max}. Please answer again.`, ephemeral: true });
+								await thread.send({ content: `Your response must be between ${question.min} and ${question.max}. Please answer again.` });
 							}
 						} else if (question.min && value < question.min) {
-							await thread.send({ content: `Your response must be greater than ${question.min}. Please answer again.`, ephemeral: true });
+							await thread.send({ content: `Your response must be greater than ${question.min}. Please answer again.`});
 						} else if (question.max && value > question.max) {
-							await thread.send({ content: `Your response must be less than ${question.max}. Please answer again.`, ephemeral: true });
+							await thread.send({ content: `Your response must be less than ${question.max}. Please answer again.`});
 						}
 					}
 				});
@@ -122,14 +121,14 @@ export async function numberQuestionCollector(interaction, thread, question) {
 					}
 					if (collected.size === 0) {
 						if (collector.endReason !== 'threadDelete') {
-							await thread.send({ content: 'No response given in time.', ephemeral: true });
+							await thread.send({ content: 'No response given in time.' });
 						}
 						resolve(undefined);
 						return;
 					}
 
-					const response = parseInt(collected.first().content);
-					await thread.send({ content: `Your response was: ${response}`, ephemeral: true });
+					const response = parseInt(collected.first()!.content);
+					await thread.send({ content: `Your response was: ${response}` });
 					resolve(response);
 				});
 			});
@@ -144,27 +143,27 @@ export async function numberQuestionCollector(interaction, thread, question) {
 	});
 }
 
-export async function selectQuestionCollector(interaction, thread, question) {
+export async function selectQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: any) {
 	return new Promise((resolve, reject) => {
 		const embed = selectQuestionEmbed(thread, question);
 		thread.send(embed)
 			.then(async msg => {
-				const selectFilter = i => i.user.id === interaction.user.id;
-				const selection = await msg.awaitMessageComponent({ selectFilter, time: 43_200_000 });
+				const selectFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
+				const selection: any = await msg.awaitMessageComponent({ filter: selectFilter, time: 43_200_000 });
 				await selection.deferUpdate();
 				if (selection.customId.startsWith('skip-')) {
 					await thread.send({ content: 'Question skipped.' });
 					resolve(undefined);
 					return;
 				}
-				await thread.send({ content: `Your response was: ${selection.values}`, ephemeral: true });
+				await thread.send({ content: `Your response was: ${selection.values}` });
 				resolve(selection.values);
 			})
 			.catch(async err => {
 				if (err.message === 'Collector received no interactions before ending with reason: time') {
-					const updatedThread = await interaction.guild.channels.fetch(thread.id);
-					if (updatedThread) {
-						await updatedThread.send({ content: 'No response given in time.', ephemeral: true });
+					const updatedThread: ThreadChannel = await interaction.guild!.channels.fetch(thread.id) as ThreadChannel;
+					if (updatedThread !== null) {
+						await updatedThread.send({ content: 'No response given in time.' });
 					}
 					resolve(undefined);
 				} else if (err.message === 'Collector received no interactions before ending with reason: threadDelete') {
@@ -178,7 +177,7 @@ export async function selectQuestionCollector(interaction, thread, question) {
 	});
 }
 
-export async function fileUploadQuestionCollector(interaction, thread, question) {
+export async function fileUploadQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: any) {
 	return new Promise((resolve, reject) => {
 		try {
 			const embed = questionEmbed(thread, question);
@@ -186,12 +185,12 @@ export async function fileUploadQuestionCollector(interaction, thread, question)
 				const min = question.min ?? 1;
 				const max = question.max ?? 10;
 
-				const filter = m => {
+				const filter = (m: Message) => {
 					return m.author.id === interaction.user.id && m.attachments.size >= min && m.attachments.size <= max;
 				};
 
 				let questionSkipped = false;
-				const skipFilter = i => i.user.id === interaction.user.id;
+				const skipFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
 				msg.awaitMessageComponent({ filter: skipFilter, time: 43_200_000 })
 					.then(i => {
 						i.deferUpdate();
@@ -210,9 +209,9 @@ export async function fileUploadQuestionCollector(interaction, thread, question)
 
 				collector.on('ignore', async m => {
 					if (m.attachments.size === 0 && m.author.id === interaction.user.id) {
-						await thread.send({ content: 'Your response must include an attachment. Please answer again.', ephemeral: true });
+						await thread.send({ content: 'Your response must include an attachment. Please answer again.' });
 					} else if ((m.attachments.size < min || m.attachments.size > max) && m.author.id === interaction.user.id) {
-						await thread.send({ content: `Your response must include between ${min} and ${max} attachments. Please upload the requested files again.`, ephemeral: true });
+						await thread.send({ content: `Your response must include between ${min} and ${max} attachments. Please upload the requested files again.` });
 					}
 				});
 
@@ -224,19 +223,19 @@ export async function fileUploadQuestionCollector(interaction, thread, question)
 					}
 					if (collected.size === 0) {
 						if (collector.endReason !== 'threadDelete') {
-							await thread.send({ content: 'No response given in time.', ephemeral: true });
+							await thread.send({ content: 'No response given in time.' });
 						}
 						resolve(undefined);
 						return;
 					}
 
-					const attachments = collected.first().attachments;
+					const attachments = collected.first()!.attachments;
 					const response = attachments.map(attachment => attachment.url);
 					let responseMsg = 'Your response was:';
 					response.forEach(url => {
 						responseMsg += `\n${url}`;
 					});
-					await thread.send({ content: responseMsg, ephemeral: true });
+					await thread.send({ content: responseMsg });
 					resolve(response);
 				});
 			});

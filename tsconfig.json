@@ -5,7 +5,7 @@
 		"outDir": "bin",
 		"rootDir": "src",
 		"strict": true,
-		"noImplicitAny": false,
+		"noImplicitAny": true,
 		"strictNullChecks": true,
 		"moduleResolution": "NodeNext",
 		"types": [

@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 // load commands from subfolders into an array
-async function loadCommands(rootDir) {
+async function loadCommands(rootDir: string) {
 	const commands: Object[] = [];
 	const commandPath = path.join(rootDir, 'commands');
 	const commandFiles = fs.readdirSync(commandPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
@@ -21,7 +21,7 @@ async function loadCommands(rootDir) {
 }
 
 // reload the commands on Discord
-export default (rootDir, clientId, token) => {
+export default (rootDir: string, clientId: string, token: string) => {
 	return new Promise((resolve, reject) => {
 		try {
 			loadCommands(rootDir)

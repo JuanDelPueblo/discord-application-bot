@@ -1,4 +1,4 @@
-import { Events, ChannelType } from 'discord.js';
+import { Events, ChannelType, BaseInteraction, TextChannel, ThreadChannel } from 'discord.js';
 import { Forms, Answers } from '../database.js';
 import { textQuestionCollector, numberQuestionCollector, selectQuestionCollector, fileUploadQuestionCollector } from '../utils/questions.js';
 import { formSubmittedEmbed, formFinishedEmbed } from '../utils/embeds.js';
@@ -11,7 +11,7 @@ import formCommand from '../commands/form.js';
 
 
 export const name = Events.InteractionCreate;
-export async function execute(interaction) {
+export async function execute(interaction: BaseInteraction) {
 	if (interaction.isChatInputCommand()) {
 		const command = interaction.commandName;
 
@@ -65,7 +65,8 @@ export async function execute(interaction) {
 
 				await interaction.deferUpdate();
 
-				const thread = await interaction.channel.threads.create({
+				const channel = interaction.channel as TextChannel;
+				const thread = await channel.threads.create({
 					name: `${interaction.user.username}'s application`,
 					autoArchiveDuration: 10080,
 					type: ChannelType.PrivateThread,
@@ -73,10 +74,10 @@ export async function execute(interaction) {
 
 				// add all roles with permissions to view the form to the thread
 				const rolePermissions = await form.getRoles();
-				for (const rolePermission of rolePermissions.filter(r => r.permission !== 'none')) {
-					const role = await interaction.guild.roles.fetch(rolePermission.role_id);
-					if (role === undefined) continue;
-					const members = await role.members.values();
+				for (const rolePermission of rolePermissions.filter((r: any) => r.permission !== 'none')) {
+					const role = await interaction.guild!.roles.fetch(rolePermission.role_id);
+					if (role === undefined || null) continue;
+					const members = role!.members.values();
 					for (const member of members) {
 						await thread.members.add(member.user.id);
 					}
@@ -85,7 +86,7 @@ export async function execute(interaction) {
 				await thread.send({ content: `Welcome to your application, ${interaction.user}! Please answer the following questions to the best of your ability.` });
 
 				const application = await form.createApplication({
-					form_channel_id: interaction.channel.id,
+					form_channel_id: interaction.channel!.id,
 					thread_id: thread.id,
 					user_id: interaction.user.id,
 					submitted: false,
@@ -99,7 +100,7 @@ export async function execute(interaction) {
 						const response = await textQuestionCollector(interaction, thread, question);
 						if (response === undefined) break;
 						if (response === undefined && question.required) {
-							const updatedThread = await interaction.guild.channels.fetch(thread.id);
+							const updatedThread = await interaction.guild!.channels.fetch(thread.id);
 							if (updatedThread) {
 								updatedThread.delete();
 							}
@@ -119,7 +120,7 @@ export async function execute(interaction) {
 						const response = await numberQuestionCollector(interaction, thread, question);
 						if (response === undefined) break;
 						if (response === undefined && question.required) {
-							const updatedThread = await interaction.guild.channels.fetch(thread.id);
+							const updatedThread = await interaction.guild!.channels.fetch(thread.id);
 							if (updatedThread) {
 								updatedThread.delete();
 							}
@@ -139,7 +140,7 @@ export async function execute(interaction) {
 						const response = await selectQuestionCollector(interaction, thread, question);
 						if (response === undefined) break;
 						if (response === undefined && question.required) {
-							const updatedThread = await interaction.guild.channels.fetch(thread.id);
+							const updatedThread = await interaction.guild!.channels.fetch(thread.id);
 							if (updatedThread) {
 								updatedThread.delete();
 							}
@@ -159,7 +160,7 @@ export async function execute(interaction) {
 						const response = await fileUploadQuestionCollector(interaction, thread, question);
 						if (response === undefined) break;
 						if (response === undefined && question.required) {
-							const updatedThread = await interaction.guild.channels.fetch(thread.id);
+							const updatedThread = await interaction.guild!.channels.fetch(thread.id);
 							if (updatedThread) {
 								updatedThread.delete();
 							}
@@ -197,8 +198,9 @@ export async function execute(interaction) {
 			try {
 				const approved = button.startsWith('approve-');
 
+				const thread = interaction.channel as ThreadChannel;
 				const form = await Forms.findOne({
-					where: { form_channel_id: interaction.channel.parentId },
+					where: { form_channel_id: thread.parentId },
 				});
 				if (form === null) {
 					return interaction.reply({ content: 'Unable to find form for this application.', ephemeral: true });
@@ -207,9 +209,9 @@ export async function execute(interaction) {
 				// check if the user has permission to approve/deny applications
 				const rolePermissions = await form.getRoles();
 				const roles = await Promise.all(rolePermissions
-					.filter(r => r.permission === 'action')
-					.map(async (role) => await interaction.guild.roles.fetch(role.role_id)));
-				const member = await interaction.guild.members.fetch(interaction.user.id);
+					.filter((r: any) => r.permission === 'action')
+					.map(async (role: any) => await interaction.guild!.roles.fetch(role.role_id)));
+				const member = await interaction.guild!.members.fetch(interaction.user.id);
 				let hasPermission = false;
 				for (const role of roles) {
 					if (role === undefined) continue;
@@ -238,15 +240,14 @@ export async function execute(interaction) {
 					return interaction.followUp({ content: 'This form has no actions set.', ephemeral: true });
 				}
 
-				const appMember = await interaction.guild.members.fetch(application.user_id);
+				const appMember = await interaction.guild!.members.fetch(application.user_id);
 				if (appMember === null) {
 					return interaction.followUp({ content: 'Unable to find member for this application. Cannot execute actions if the member is not present in the guild.', ephemeral: true });
 				}
 
 				// execute actions
-				const thread = await interaction.guild.channels.fetch(button.split('-')[1]);
 				let threadDeleted = false;
-				await Promise.all(actions.map(async (action) => {
+				await Promise.all(actions.map(async (action: any) => {
 					if (action.when === 'approved' && approved) {
 						if (action.do === 'delete') {
 							await thread.delete();
@@ -274,12 +275,17 @@ export async function execute(interaction) {
 			}
 		}
 	} else if (interaction.isAutocomplete()) {
-		const command = interaction.client.commands.get(interaction.commandName);
+		const command = interaction.commandName;
 
 		if (!command) return;
 
 		try {
-			await command.autocomplete(interaction);
+			switch (command) {
+			case 'action':
+				await actionCommand.autocomplete(interaction);
+			case 'question':
+				await questionCommand.autocomplete(interaction);
+			}
 		} catch (error) {
 			console.error(error);
 		}

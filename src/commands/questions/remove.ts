@@ -1,7 +1,8 @@
+import { BaseInteraction, ChatInputCommandInteraction } from 'discord.js';
 import { Questions } from '../../database.js';
 import { questionRemoveEmbed } from '../../utils/embeds.js';
 
-export default async function removeCommand(interaction, currentForm) {
+export default async function removeCommand(interaction: ChatInputCommandInteraction, currentForm: any) {
 	const id = await interaction.options.getInteger('id');
 
 	const questions = await Questions.findAll({
@@ -9,7 +10,7 @@ export default async function removeCommand(interaction, currentForm) {
 		order: [['order', 'ASC']],
 	});
 
-	const questionToRemove = questions.find(question => question.question_id === id);
+	const questionToRemove = questions.find((question: any) => question.question_id === id);
 
 	if (!questionToRemove) {
 		await interaction.reply({ content: 'There is no question with that ID configured for this form!', ephemeral: true });
@@ -18,7 +19,7 @@ export default async function removeCommand(interaction, currentForm) {
 
 	// get confirmation as to whenether the user wants to remove the question or not
 	const confirmationMsg = await interaction.reply(questionRemoveEmbed(questionToRemove));
-	const filter = i => i.user.id === interaction.user.id;
+	const filter = (i: BaseInteraction) => i.user.id === interaction.user.id;
 	const response = await confirmationMsg.awaitMessageComponent({ filter, time: 43_200_000 });
 
 	if (response.customId.startsWith('cancel-remove-question-')) return response.update({ content: 'Question removal cancelled.', components: [], embeds: [] });
@@ -29,7 +30,7 @@ export default async function removeCommand(interaction, currentForm) {
 		questions[i].order = questions[i].order - 1;
 	}
 
-	await Promise.all(questions.map(question => question.save()));
+	await Promise.all(questions.map((question: any) => question.save()));
 
 	await questionToRemove.destroy();
 

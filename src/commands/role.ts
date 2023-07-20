@@ -1,4 +1,4 @@
-import { EmbedBuilder, SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { EmbedBuilder, SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js';
 import { Forms, Roles } from '../database.js';
 import { loadConfig } from '../index.js';
 
@@ -31,9 +31,9 @@ export const data = new SlashCommandBuilder()
 			.setRequired(true),
 		),
 	);
-export async function execute(interaction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
 	const subcommand = interaction.options.getSubcommand();
-	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel!.id } });
 
 	if (!currentForm) {
 		await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true });
@@ -51,13 +51,13 @@ export async function execute(interaction) {
 				.setTitle('Roles with permissions for this form')
 				.setColor(color);
 				// set up embed fields with roles and permissions
-			roles.forEach(role => {
-				const roleObj = interaction.guild.roles.cache.get(role.role_id);
+			roles.forEach((role: any) => {
+				const roleObj = interaction.guild!.roles.cache.get(role.role_id);
 				let rolePermissions = 'No permissions set for this role';
 				if (role.permission === 'view') rolePermissions = 'Can view applications';
 				if (role.permission === 'action') rolePermissions = 'Can view and take action on applications';
 				embed.addFields({
-					name: `${roleObj.name}`,
+					name: `${roleObj!.name}`,
 					value: rolePermissions,
 				});
 			});
@@ -70,11 +70,11 @@ export async function execute(interaction) {
 		const permission = await interaction.options.getString('permission');
 		Roles.upsert({
 			form_channel_id: currentForm.form_channel_id,
-			role_id: role.id,
+			role_id: role!.id,
 			permission: permission,
 		})
-			.then(() => interaction.reply({ content: `Set permissions for <@&${role.id}>`, ephemeral: true }))
-			.catch((err) => {
+			.then(() => interaction.reply({ content: `Set permissions for <@&${role!.id}>`, ephemeral: true }))
+			.catch((err: any) => {
 				console.error(err);
 				interaction.reply({ content: 'Something went wrong!', ephemeral: true });
 			});
@@ -82,8 +82,8 @@ export async function execute(interaction) {
 	}
 	case 'remove': {
 		const roleToRemove = await interaction.options.getRole('role');
-		Roles.destroy({ where: { form_channel_id: currentForm.form_channel_id, role_id: roleToRemove.id } })
-			.then(() => interaction.reply({ content: `Removed all permissions for <@&${roleToRemove.id}>`, ephemeral: true }))
+		Roles.destroy({ where: { form_channel_id: currentForm.form_channel_id, role_id: roleToRemove!.id } })
+			.then(() => interaction.reply({ content: `Removed all permissions for <@&${roleToRemove!.id}>`, ephemeral: true }))
 			.catch(() => interaction.reply({ content: 'Something went wrong!', ephemeral: true }));
 		break;
 	}

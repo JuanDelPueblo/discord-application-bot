@@ -1,4 +1,4 @@
-import { ChannelType, SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { ChannelType, SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js';
 import { Forms } from '../database.js';
 import listCommand from './action/list.js';
 import addCommand from './action/add.js';
@@ -156,9 +156,9 @@ export const data = new SlashCommandBuilder()
 			.setAutocomplete(true),
 		),
 	);
-export async function autocomplete(interaction) {
+export async function autocomplete(interaction: AutocompleteInteraction) {
 	const subcommand = interaction.options.getSubcommand();
-	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel!.id } });
 
 	if (!currentForm) {
 		return await interaction.respond([]);
@@ -168,15 +168,15 @@ export async function autocomplete(interaction) {
 		// autocomplete action names
 		const actions = await currentForm.getActions();
 		const focusedValue = interaction.options.getFocused();
-		const filtered = actions.filter(action => action.name.startsWith(focusedValue)).slice(0, 25);
+		const filtered = actions.filter((action: any) => action.name.startsWith(focusedValue)).slice(0, 25);
 		await interaction.respond(
-			filtered.map(action => ({ name: action.name, value: action.name })),
+			filtered.map((action: any) => ({ name: action.name, value: action.name })),
 		);
 	}
 }
-export async function execute(interaction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
 	const subcommand = interaction.options.getSubcommand();
-	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel!.id } });
 
 	if (!currentForm) {
 		await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true });

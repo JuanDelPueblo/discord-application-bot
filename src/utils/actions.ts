@@ -1,10 +1,10 @@
-import { userMention } from 'discord.js';
+import { ButtonInteraction, GuildMember, TextChannel, userMention } from 'discord.js';
 
-export default async function executeAction(interaction, member, action) {
+export default async function executeAction(interaction: ButtonInteraction, member: GuildMember, action: any) {
 	try {
 		switch (action.do) {
 		case 'removerole': {
-			const role = interaction.guild.roles.cache.get(action.role_id);
+			const role = interaction.guild!.roles.cache.get(action.role_id);
 			if (!role) {
 				await interaction.followUp({ content: 'The role for this action no longer exists!', ephemeral: true });
 				return;
@@ -15,7 +15,7 @@ export default async function executeAction(interaction, member, action) {
 			break;
 		}
 		case 'addrole': {
-			const role = interaction.guild.roles.cache.get(action.role_id);
+			const role = interaction.guild!.roles.cache.get(action.role_id);
 			if (!role) {
 				await interaction.followUp({ content: 'The role for this action no longer exists!', ephemeral: true });
 				return;
@@ -27,16 +27,16 @@ export default async function executeAction(interaction, member, action) {
 		}
 		case 'ban': {
 			const reason = action.reason ?? 'No reason given';
-			await interaction.guild.members.ban(member, { reason });
+			await interaction.guild!.members.ban(member, reason);
 			break;
 		}
 		case 'kick': {
 			const reason = action.reason ?? 'No reason given';
-			await interaction.guild.members.kick(member, { reason });
+			await interaction.guild!.members.kick(member, reason);
 			break;
 		}
 		case 'sendmessage': {
-			const channel = interaction.guild.channels.cache.get(action.message_channel_id);
+			const channel = interaction.guild!.channels.cache.get(action.message_channel_id) as TextChannel;
 			if (!channel) {
 				await interaction.followUp({ content: 'The channel for this action no longer exists!', ephemeral: true });
 				return;

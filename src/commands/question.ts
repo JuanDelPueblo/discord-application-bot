@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js';
 import { Forms } from '../database.js';
 import editCommand from './questions/edit.js';
 import addCommand from './questions/add.js';
@@ -115,9 +115,9 @@ export const data = new SlashCommandBuilder()
 			.setRequired(true),
 		),
 	);
-export async function autocomplete(interaction) {
+export async function autocomplete(interaction: AutocompleteInteraction) {
 	const subcommand = interaction.options.getSubcommand();
-	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel!.id } });
 
 	if (!currentForm) {
 		return await interaction.respond([]);
@@ -127,18 +127,18 @@ export async function autocomplete(interaction) {
 		// autocomplete question ID for remove and edit subcommands
 		const questions = await currentForm.getQuestions();
 		const focusedValue = interaction.options.getFocused();
-		const filtered = questions.filter(question => {
+		const filtered = questions.filter((question: any) => {
 			const questionId = question.question_id;
 			return String(questionId).startsWith(focusedValue);
 		}).slice(0, 25);
 		await interaction.respond(
-			filtered.map(question => ({ name: question.title, value: question.question_id })),
+			filtered.map((question: any) => ({ name: question.title, value: question.question_id })),
 		);
 	}
 }
-export async function execute(interaction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
 	const subcommand = interaction.options.getSubcommand();
-	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel!.id } });
 
 	if (!currentForm) {
 		await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true });

@@ -1,4 +1,4 @@
-import { channelMention, SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { channelMention, SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js';
 import { Forms } from '../database.js';
 import setupCommand from './form/setup.js';
 import editCommand from './form/edit.js';
@@ -40,9 +40,9 @@ export const data = new SlashCommandBuilder()
 			.setMinValue(1),
 		),
 	);
-export async function execute(interaction) {
+export async function execute(interaction: ChatInputCommandInteraction) {
 	const subcommand = await interaction.options.getSubcommand();
-	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel.id } });
+	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel!.id } });
 
 	if (!currentForm && !['list', 'setup'].includes(subcommand)) {
 		await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true });
@@ -79,7 +79,7 @@ export async function execute(interaction) {
 		if (forms.length === 0) {
 			await interaction.reply({ content: 'No forms found!', ephemeral: true });
 		} else {
-			const formsList = forms.map(form => `${channelMention(form.form_channel_id)} - ${form.title}`);
+			const formsList = forms.map((form: any) => `${channelMention(form.form_channel_id)} - ${form.title}`);
 			await interaction.reply({ content: formsList.join('\n'), ephemeral: true });
 		}
 		break;

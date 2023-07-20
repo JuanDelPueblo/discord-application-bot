@@ -9,7 +9,7 @@ export function loadConfig() {
 	return JSON.parse(configFile);
 }
 
-async function registerEvents(client) {
+async function registerEvents(client: Client) {
 	const eventsPath = join(parentDirectory, 'src/events');
 	try {
 		const eventFiles = readdirSync(eventsPath);

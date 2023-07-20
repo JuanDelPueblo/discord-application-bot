@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 // load models from subfolders and register them
-async function registerModels(sequelize, rootDir) {
+async function registerModels(sequelize, rootDir: string) {
 	const modelsPath = path.resolve(rootDir, 'models');
 	const files = await fs.promises.readdir(modelsPath);
 
@@ -21,7 +21,7 @@ async function registerModels(sequelize, rootDir) {
 
 
 // initialize the database
-export default (rootDir) => {
+export default (rootDir: string) => {
 	return new Promise((resolve, reject) => {
 		try {
 			const sequelize = new Sequelize({

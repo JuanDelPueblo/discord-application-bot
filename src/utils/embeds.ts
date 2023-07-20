@@ -1,7 +1,7 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, roleMention } from 'discord.js';
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageCreateOptions, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ThreadChannel, roleMention } from 'discord.js';
 import { loadConfig } from '../index.js';
 
-export function formEmbed(interaction, formData) {
+export function formEmbed(interaction: BaseInteraction, formData: any) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)
@@ -10,17 +10,17 @@ export function formEmbed(interaction, formData) {
 	if (formData.description) embed.setDescription(formData.description);
 
 	const formButton = new ButtonBuilder()
-		.setCustomId(`form-${interaction.channel.id}`)
+		.setCustomId(`form-${interaction.channel!.id}`)
 		.setLabel(formData.button_text || 'New Application')
 		.setStyle(ButtonStyle.Primary);
 
-	const buttonRow = new ActionRowBuilder()
+	const buttonRow = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(formButton);
 
 	return { embeds: [embed], components: [buttonRow] };
 }
 
-export function questionEmbed(thread, question) {
+export function questionEmbed(thread: ThreadChannel, question: any) {
 	const { color } = loadConfig();
 	let type = question.type.charAt(0).toUpperCase() + question.type.slice(1);
 	if (type === 'Fileupload') type = 'File Upload';
@@ -40,13 +40,13 @@ export function questionEmbed(thread, question) {
 		.setLabel('Skip')
 		.setStyle(ButtonStyle.Secondary);
 
-	const row = new ActionRowBuilder()
+	const row = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(skipButton);
 
 	return { embeds: [embed], components: [row] };
 }
 
-export function selectQuestionEmbed(thread, question) {
+export function selectQuestionEmbed(thread: ThreadChannel, question: any) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)
@@ -58,7 +58,7 @@ export function selectQuestionEmbed(thread, question) {
 		.setPlaceholder('Select an option')
 		.setMinValues(question.min)
 		.setMaxValues(question.max)
-		.addOptions(question.options.map(option => new StringSelectMenuOptionBuilder()
+		.addOptions(question.options.map((option: any) => new StringSelectMenuOptionBuilder()
 			.setLabel(option)
 			.setValue(option)));
 
@@ -67,10 +67,10 @@ export function selectQuestionEmbed(thread, question) {
 		.setLabel('Skip')
 		.setStyle(ButtonStyle.Secondary);
 
-	const row = new ActionRowBuilder()
+	const row = new ActionRowBuilder<StringSelectMenuBuilder>()
 		.addComponents(selectMenu);
 
-	const row2 = new ActionRowBuilder()
+	const row2 = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(skipButton);
 
 	if (question.required) return { embeds: [embed], components: [row] };
@@ -78,7 +78,7 @@ export function selectQuestionEmbed(thread, question) {
 	return { embeds: [embed], components: [row, row2] };
 }
 
-export function formSubmittedEmbed(thread, rolePermissions) {
+export function formSubmittedEmbed(thread: ThreadChannel, rolePermissions: any) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)
@@ -95,7 +95,7 @@ export function formSubmittedEmbed(thread, rolePermissions) {
 		.setLabel('Deny')
 		.setStyle(ButtonStyle.Danger);
 
-	const buttonRow = new ActionRowBuilder()
+	const buttonRow = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(approveButton, denyButton);
 
 	let roleMentionsMsg = '';
@@ -110,7 +110,7 @@ export function formSubmittedEmbed(thread, rolePermissions) {
 	return { content: roleMentionsMsg, embeds: [embed], components: [buttonRow] };
 }
 
-export function formFinishedEmbed(approved) {
+export function formFinishedEmbed(approved: Boolean) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)
@@ -120,7 +120,7 @@ export function formFinishedEmbed(approved) {
 	return { embeds: [embed] };
 }
 
-export function questionRemoveEmbed(question) {
+export function questionRemoveEmbed(question: any) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)
@@ -137,7 +137,7 @@ export function questionRemoveEmbed(question) {
 		.setLabel('Cancel')
 		.setStyle(ButtonStyle.Secondary);
 
-	const buttonRow = new ActionRowBuilder()
+	const buttonRow = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(confirmButton, cancelButton);
 
 	return { embeds: [embed], components: [buttonRow], ephemeral: true };

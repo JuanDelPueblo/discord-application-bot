@@ -1,6 +1,7 @@
+import { ChatInputCommandInteraction } from 'discord.js';
 import { Actions } from '../../database.js';
 
-export default async function addCommand(interaction, currentForm, action) {
+export default async function addCommand(interaction: ChatInputCommandInteraction, currentForm: any, action: any) {
 	const name = interaction.options.getString('name');
 	const when = interaction.options.getString('when');
 
@@ -21,7 +22,7 @@ export default async function addCommand(interaction, currentForm, action) {
 				name: name,
 				when: when,
 				do: action,
-				role_id: role.id,
+				role_id: role!.id,
 			});
 
 			await interaction.reply({ content: `The action ${name} has been added to this form!`, ephemeral: true });
@@ -51,7 +52,7 @@ export default async function addCommand(interaction, currentForm, action) {
 				name: name,
 				when: when,
 				do: action,
-				message_channel_id: channel.id,
+				message_channel_id: channel!.id,
 				message: message,
 			});
 
