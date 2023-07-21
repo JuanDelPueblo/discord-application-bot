@@ -1,11 +1,12 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { Actions } from '../../database.js';
+import Form from '../../models/Form.model.js';
+import Action from '../../models/Action.model.js';
 
-export default async function removeCommand(interaction: ChatInputCommandInteraction, currentForm: any) {
+export default async function removeCommand(interaction: ChatInputCommandInteraction, currentForm: Form) {
 	const name = await interaction.options.getString('name');
-	Actions.findOne({ where: { form_channel_id: currentForm.form_channel_id, name: name } })
-		.then(async (action: any) => {
-			if (!action) {
+	Action.findOne({ where: { form_channel_id: currentForm.form_channel_id, name: name } })
+		.then(async (action: Action | null) => {
+			if (action === null) {
 				await interaction.reply({ content: 'There is no action with that name configured for this form!', ephemeral: true });
 			} else {
 				await action.destroy();

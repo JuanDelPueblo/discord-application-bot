@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js';
-import { Forms } from '../database.js';
+import Form from '../models/Form.model.js';
 import editCommand from './questions/edit.js';
 import addCommand from './questions/add.js';
 import removeCommand from './questions/remove.js';
@@ -117,28 +117,26 @@ export const data = new SlashCommandBuilder()
 	);
 export async function autocomplete(interaction: AutocompleteInteraction) {
 	const subcommand = interaction.options.getSubcommand();
-	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel!.id } });
+	const currentForm = await Form.findOne({ where: { form_channel_id: interaction.channel!.id } });
 
 	if (!currentForm) {
 		return await interaction.respond([]);
-	}
-
-	if (subcommand === 'remove' || subcommand === 'edit') {
+	} else if (subcommand === 'remove' || subcommand === 'edit') {
 		// autocomplete question ID for remove and edit subcommands
-		const questions = await currentForm.getQuestions();
+		const questions = await currentForm.$get('question');
 		const focusedValue = interaction.options.getFocused();
-		const filtered = questions.filter((question: any) => {
+		const filtered = questions.filter((question) => {
 			const questionId = question.question_id;
 			return String(questionId).startsWith(focusedValue);
 		}).slice(0, 25);
 		await interaction.respond(
-			filtered.map((question: any) => ({ name: question.title, value: question.question_id })),
+			filtered.map((question) => ({ name: question.title, value: question.question_id })),
 		);
 	}
 }
 export async function execute(interaction: ChatInputCommandInteraction) {
 	const subcommand = interaction.options.getSubcommand();
-	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel!.id } });
+	const currentForm = await Form.findOne({ where: { form_channel_id: interaction.channel!.id } });
 
 	if (!currentForm) {
 		await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true });

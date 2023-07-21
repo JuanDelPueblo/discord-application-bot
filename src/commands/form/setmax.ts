@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction } from "discord.js";
+import Form from "../../models/Form.model.js";
 
-export default async function setMaxCommand(interaction: ChatInputCommandInteraction, currentForm: any) {
+export default async function setMaxCommand(interaction: ChatInputCommandInteraction, currentForm: Form) {
 	const max = await interaction.options!.getInteger('max');
 	await currentForm.update({ max });
 	if (max) {

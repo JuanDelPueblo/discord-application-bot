@@ -1,10 +1,10 @@
 import { Events, ChannelType, BaseInteraction, TextChannel, ThreadChannel } from 'discord.js';
-import { Forms, Answers } from '../database.js';
+import Form from '../models/Form.model.js';
+import Answer from '../models/Answer.model.js';
 import { textQuestionCollector, numberQuestionCollector, selectQuestionCollector, fileUploadQuestionCollector } from '../utils/questions.js';
 import { formSubmittedEmbed, formFinishedEmbed } from '../utils/embeds.js';
 import executeAction from '../utils/actions.js';
 import roleCommand from '../commands/role.js';
-import helpCommand from '../commands/help.js';
 import questionCommand from '../commands/question.js';
 import actionCommand from '../commands/action.js';
 import formCommand from '../commands/form.js';
@@ -24,9 +24,6 @@ export async function execute(interaction: BaseInteraction) {
 			switch (command) {
 			case 'role':
 				await roleCommand.execute(interaction);
-				break;
-			case 'help':
-				await helpCommand.execute(interaction);
 				break;
 			case 'question':
 				await questionCommand.execute(interaction);
@@ -48,16 +45,20 @@ export async function execute(interaction: BaseInteraction) {
 		if (button.startsWith('form-')) { // create a new application thread
 			try {
 				const formChannelId = button.split('-')[1];
-				const form = await Forms.findOne({
+				const form = await Form.findOne({
 					where: { form_channel_id: formChannelId },
 				});
+
+				if (form === null) {
+					return interaction.reply({ content: 'Unable to find form for this application.', ephemeral: true });
+				}
 
 				if (!form.enabled) {
 					return interaction.reply({ content: 'This form is currently not open for submissions.', ephemeral: true });
 				}
 
 				if (form.max) {
-					const applications = await form.getApplications({ where: { form_channel_id: formChannelId, user_id: interaction.user.id } });
+					const applications = await form.$get('application', { where: { form_channel_id: formChannelId, user_id: interaction.user.id } });
 					if (applications.length >= form.max) {
 						return interaction.reply({ content: `You cannot submit more than ${form.max} applications at a time!`, ephemeral: true });
 					}
@@ -73,8 +74,8 @@ export async function execute(interaction: BaseInteraction) {
 				});
 
 				// add all roles with permissions to view the form to the thread
-				const rolePermissions = await form.getRoles();
-				for (const rolePermission of rolePermissions.filter((r: any) => r.permission !== 'none')) {
+				const rolePermissions = await form.$get('role');
+				for (const rolePermission of rolePermissions.filter(r => r.permission !== 'none')) {
 					const role = await interaction.guild!.roles.fetch(rolePermission.role_id);
 					if (role === undefined || null) continue;
 					const members = role!.members.values();
@@ -85,7 +86,7 @@ export async function execute(interaction: BaseInteraction) {
 				await thread.members.add(interaction.user.id);
 				await thread.send({ content: `Welcome to your application, ${interaction.user}! Please answer the following questions to the best of your ability.` });
 
-				const application = await form.createApplication({
+				const application = await form.$create('application', {
 					form_channel_id: interaction.channel!.id,
 					thread_id: thread.id,
 					user_id: interaction.user.id,
@@ -93,7 +94,7 @@ export async function execute(interaction: BaseInteraction) {
 				});
 
 				// send all questions in order for the applicant to answer
-				const questions = await form.getQuestions({ order: [['order', 'ASC']] });
+				const questions = await form.$get('question', { order: [['order', 'ASC']] });
 				for (const question of questions) {
 					switch (question.type) {
 					case 'text': {
@@ -106,7 +107,7 @@ export async function execute(interaction: BaseInteraction) {
 							}
 							return;
 						}
-						await Answers.create({
+						await Answer.create({
 							thread_id: thread.id,
 							question_id: question.question_id,
 							answer: {
@@ -126,7 +127,7 @@ export async function execute(interaction: BaseInteraction) {
 							}
 							return;
 						}
-						await Answers.create({
+						await Answer.create({
 							thread_id: thread.id,
 							question_id: question.question_id,
 							answer: {
@@ -146,7 +147,7 @@ export async function execute(interaction: BaseInteraction) {
 							}
 							return;
 						}
-						await Answers.create({
+						await Answer.create({
 							thread_id: thread.id,
 							question_id: question.question_id,
 							answer: {
@@ -166,7 +167,7 @@ export async function execute(interaction: BaseInteraction) {
 							}
 							return;
 						}
-						await Answers.create({
+						await Answer.create({
 							thread_id: thread.id,
 							question_id: question.question_id,
 							answer: {
@@ -199,7 +200,7 @@ export async function execute(interaction: BaseInteraction) {
 				const approved = button.startsWith('approve-');
 
 				const thread = interaction.channel as ThreadChannel;
-				const form = await Forms.findOne({
+				const form = await Form.findOne({
 					where: { form_channel_id: thread.parentId },
 				});
 				if (form === null) {
@@ -207,15 +208,15 @@ export async function execute(interaction: BaseInteraction) {
 				}
 
 				// check if the user has permission to approve/deny applications
-				const rolePermissions = await form.getRoles();
+				const rolePermissions = await form.$get('role');
 				const roles = await Promise.all(rolePermissions
-					.filter((r: any) => r.permission === 'action')
-					.map(async (role: any) => await interaction.guild!.roles.fetch(role.role_id)));
+					.filter(r => r.permission === 'action')
+					.map(async role => await interaction.guild!.roles.fetch(role.role_id)));
 				const member = await interaction.guild!.members.fetch(interaction.user.id);
 				let hasPermission = false;
 				for (const role of roles) {
-					if (role === undefined) continue;
-					if (member.roles.cache.some(r => r.name === role.name)) {
+					if (role === undefined || null) continue;
+					if (member.roles.cache.some(r => r.name === role!.name)) {
 						hasPermission = true;
 					}
 				}
@@ -225,7 +226,7 @@ export async function execute(interaction: BaseInteraction) {
 				}
 
 				// update the application with the approval status
-				const applications = await form.getApplications({
+				const applications = await form.$get('application', {
 					where: { thread_id: button.split('-')[1] },
 				});
 				const application = applications[0];
@@ -235,7 +236,7 @@ export async function execute(interaction: BaseInteraction) {
 				await interaction.reply(formFinishedEmbed(approved));
 
 				// get all actions for this form
-				const actions = await form.getActions();
+				const actions = await form.$get('action');
 				if (actions.length === 0) {
 					return interaction.followUp({ content: 'This form has no actions set.', ephemeral: true });
 				}
@@ -247,7 +248,7 @@ export async function execute(interaction: BaseInteraction) {
 
 				// execute actions
 				let threadDeleted = false;
-				await Promise.all(actions.map(async (action: any) => {
+				await Promise.all(actions.map(async action => {
 					if (action.when === 'approved' && approved) {
 						if (action.do === 'delete') {
 							await thread.delete();

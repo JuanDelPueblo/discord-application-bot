@@ -1,7 +1,12 @@
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Message } from 'discord.js';
-import { Questions, Actions, Roles, Applications } from '../../database.js';
+import Form from '../../models/Form.model.js';
+import Action from '../../models/Action.model.js';
+import Application from '../../models/Application.model.js';
+import Question from '../../models/Question.model.js';
+import Role from '../../models/Role.model.js';
 
-export default async function eraseCommand(interaction: ChatInputCommandInteraction, currentForm: any) {
+
+export default async function eraseCommand(interaction: ChatInputCommandInteraction, currentForm: Form) {
 	const confirm = new ButtonBuilder()
 		.setCustomId(`erase-${currentForm.form_channel_id}`)
 		.setLabel('Erase Form')
@@ -30,16 +35,16 @@ export default async function eraseCommand(interaction: ChatInputCommandInteract
 			// delete the form embed
 			await interaction.channel!.messages.fetch(currentForm.embed_message_id).then((msg: Message) => msg.delete());
 			// destroy everything related to the form by hand
-			const questions = await Questions.findAll({
+			const questions = await Question.findAll({
 				where: { form_channel_id: currentForm.form_channel_id },
 			});
 			for (const question of questions) {
 				await question.destroy();
 			}
 			await currentForm.destroy();
-			await Actions.destroy({ where: { form_channel_id: currentForm.form_channel_id } });
-			await Roles.destroy({ where: { form_channel_id: currentForm.form_channel_id } });
-			await Applications.destroy({ where: { form_channel_id: currentForm.form_channel_id } });
+			await Action.destroy({ where: { form_channel_id: currentForm.form_channel_id } });
+			await Role.destroy({ where: { form_channel_id: currentForm.form_channel_id } });
+			await Application.destroy({ where: { form_channel_id: currentForm.form_channel_id } });
 			await confirmation.update({ content: 'Form has been successfully erased!', components: [] });
 		} else if (confirmation.customId === 'cancel') {
 			await confirmation.update({ content: 'Form erase cancelled', components: [] });

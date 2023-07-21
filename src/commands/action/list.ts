@@ -1,8 +1,9 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { Actions } from '../../database.js';
+import Form from '../../models/Form.model.js';
+import Action from '../../models/Action.model.js';
 
-export default async function listCommand(interaction: ChatInputCommandInteraction, currentForm: any) {
-	const actions = await Actions.findAll({ where: { form_channel_id: currentForm.form_channel_id } });
+export default async function listCommand(interaction: ChatInputCommandInteraction, currentForm: Form) {
+	const actions = await Action.findAll({ where: { form_channel_id: currentForm.form_channel_id } });
 	if (actions.length === 0) {
 		await interaction.reply({ content: 'There are no actions configured for this form!', ephemeral: true });
 	} else {
@@ -10,6 +11,6 @@ export default async function listCommand(interaction: ChatInputCommandInteracti
 		for (const action of actions) {
 			message += `${action.name} - ${action.when} - ${action.do}\n`;
 		}
-		await interaction.reply(message);
+		await interaction.reply({ content: message, ephemeral: true });
 	}
 }

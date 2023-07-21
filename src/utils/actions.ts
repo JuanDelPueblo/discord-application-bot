@@ -1,6 +1,7 @@
 import { ButtonInteraction, GuildMember, TextChannel, userMention } from 'discord.js';
+import Action from '../models/Action.model.js';
 
-export default async function executeAction(interaction: ButtonInteraction, member: GuildMember, action: any) {
+export default async function executeAction(interaction: ButtonInteraction, member: GuildMember, action: Action) {
 	try {
 		switch (action.do) {
 		case 'removerole': {
@@ -27,7 +28,7 @@ export default async function executeAction(interaction: ButtonInteraction, memb
 		}
 		case 'ban': {
 			const reason = action.reason ?? 'No reason given';
-			await interaction.guild!.members.ban(member, reason);
+			await interaction.guild!.members.ban(member, { reason });
 			break;
 		}
 		case 'kick': {

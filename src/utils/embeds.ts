@@ -1,7 +1,10 @@
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageCreateOptions, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ThreadChannel, roleMention } from 'discord.js';
 import { loadConfig } from '../index.js';
+import Form from '../models/Form.model.js';
+import Question from '../models/Question.model.js';
+import Role from '../models/Role.model.js';
 
-export function formEmbed(interaction: BaseInteraction, formData: any) {
+export function formEmbed(interaction: BaseInteraction, formData: Form) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)
@@ -20,7 +23,7 @@ export function formEmbed(interaction: BaseInteraction, formData: any) {
 	return { embeds: [embed], components: [buttonRow] };
 }
 
-export function questionEmbed(thread: ThreadChannel, question: any) {
+export function questionEmbed(thread: ThreadChannel, question: Question) {
 	const { color } = loadConfig();
 	let type = question.type.charAt(0).toUpperCase() + question.type.slice(1);
 	if (type === 'Fileupload') type = 'File Upload';
@@ -46,7 +49,7 @@ export function questionEmbed(thread: ThreadChannel, question: any) {
 	return { embeds: [embed], components: [row] };
 }
 
-export function selectQuestionEmbed(thread: ThreadChannel, question: any) {
+export function selectQuestionEmbed(thread: ThreadChannel, question: Question) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)
@@ -58,7 +61,7 @@ export function selectQuestionEmbed(thread: ThreadChannel, question: any) {
 		.setPlaceholder('Select an option')
 		.setMinValues(question.min)
 		.setMaxValues(question.max)
-		.addOptions(question.options.map((option: any) => new StringSelectMenuOptionBuilder()
+		.addOptions(question.options.map((option) => new StringSelectMenuOptionBuilder()
 			.setLabel(option)
 			.setValue(option)));
 
@@ -78,7 +81,7 @@ export function selectQuestionEmbed(thread: ThreadChannel, question: any) {
 	return { embeds: [embed], components: [row, row2] };
 }
 
-export function formSubmittedEmbed(thread: ThreadChannel, rolePermissions: any) {
+export function formSubmittedEmbed(thread: ThreadChannel, rolePermissions: Role[]) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)
@@ -110,7 +113,7 @@ export function formSubmittedEmbed(thread: ThreadChannel, rolePermissions: any) 
 	return { content: roleMentionsMsg, embeds: [embed], components: [buttonRow] };
 }
 
-export function formFinishedEmbed(approved: Boolean) {
+export function formFinishedEmbed(approved: boolean) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)
@@ -120,7 +123,7 @@ export function formFinishedEmbed(approved: Boolean) {
 	return { embeds: [embed] };
 }
 
-export function questionRemoveEmbed(question: any) {
+export function questionRemoveEmbed(question: Question) {
 	const { color } = loadConfig();
 	const embed = new EmbedBuilder()
 		.setColor(color)

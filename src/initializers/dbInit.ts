@@ -1,24 +1,11 @@
-import { Sequelize, DataTypes } from 'sequelize';
-import fs from 'fs';
+import { Sequelize } from 'sequelize-typescript';
+import Form from '../models/Form.model.js';
+import Question from '../models/Question.model.js';
+import Role from '../models/Role.model.js';
+import Action from '../models/Action.model.js';
+import Application from '../models/Application.model.js';
+import Answer from '../models/Answer.model.js';
 import path from 'path';
-
-// load models from subfolders and register them
-async function registerModels(sequelize, rootDir: string) {
-	const modelsPath = path.resolve(rootDir, 'models');
-	const files = await fs.promises.readdir(modelsPath);
-
-	for (const file of files) {
-		if (file.endsWith('.js') || file.endsWith('.ts')) {
-			const filePath = path.resolve(modelsPath, file);
-			const modelModule = await import(filePath);
-			const modelFunction = modelModule.default || modelModule; // Handle default exports if available
-			modelFunction(sequelize, DataTypes);
-		}
-	}
-
-	return true;
-}
-
 
 // initialize the database
 export default (rootDir: string) => {
@@ -29,14 +16,13 @@ export default (rootDir: string) => {
 				dialect: 'sqlite',
 				storage: path.join(rootDir, 'database.sqlite'),
 				logging: false,
+				models: [Form, Question, Role, Action, Application, Answer],
 			});
 
-			registerModels(sequelize, rootDir)
-				.then(() => {
-					return sequelize.sync();
-				}).then(() => {
+			sequelize.sync()
+				.then(sequelize => {
+					console.log(sequelize.models)
 					console.log('Database synced');
-					sequelize.close();
 					resolve(true);
 				});
 		} catch (error) {

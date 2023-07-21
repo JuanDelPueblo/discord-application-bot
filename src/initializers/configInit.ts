@@ -15,7 +15,6 @@ export default (rootDir: string) => {
 					color: '#0099ff',
 					DO_NOT_EDIT: 'THE FOLLOWING VALUES ARE AUTO-GENERATED. DO NOT EDIT THEM UNLESS YOU KNOW WHAT YOU ARE DOING.',
 					commandsDeployed: false,
-					databaseDeployed: false,
 				};
 
 				promises.writeFile(configFilePath, JSON.stringify(initialConfig, null, 4))
@@ -28,26 +27,22 @@ export default (rootDir: string) => {
 				const configFile = readFileSync(configFilePath, 'utf8');
 				const config = JSON.parse(configFile);
 
-				if (!config.databaseDeployed) {
-					dbInit(rootDir)
-						.then(() => {
-							config.databaseDeployed = true;
-							return promises.writeFile(configFilePath, JSON.stringify(config, null, 4));
-						})
-						.catch(reject);
-				}
-
-				if (!config.commandsDeployed) {
-					commandsInit(rootDir, config.clientId, config.token)
-						.then(() => {
+				dbInit(rootDir)
+					.then(() => {
+						if (!config.commandsDeployed) {
+							return commandsInit(rootDir, config.clientId, config.token);
+						} else  {
+							return false;
+						}
+					})
+					.then((commandsDeployed) => {
+						if (commandsDeployed) {
 							config.commandsDeployed = true;
 							return promises.writeFile(configFilePath, JSON.stringify(config, null, 4));
-						})
-						.then(() => resolve(true))
-						.catch(reject);
-				} else {
-					resolve(true);
-				}
+						} 
+					})
+					.then(() => resolve(true))
+					.catch(reject);
 			}
 		} catch (error) {
 			console.error('An error occurred while initializing the config:', error);

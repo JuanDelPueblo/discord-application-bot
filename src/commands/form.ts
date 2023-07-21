@@ -1,5 +1,5 @@
 import { channelMention, SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js';
-import { Forms } from '../database.js';
+import Form from '../models/Form.model.js';
 import setupCommand from './form/setup.js';
 import editCommand from './form/edit.js';
 import eraseCommand from './form/erase.js';
@@ -42,16 +42,16 @@ export const data = new SlashCommandBuilder()
 	);
 export async function execute(interaction: ChatInputCommandInteraction) {
 	const subcommand = await interaction.options.getSubcommand();
-	const currentForm = await Forms.findOne({ where: { form_channel_id: interaction.channel!.id } });
+	const currentForm = await Form.findOne({ where: { form_channel_id: interaction.channel!.id } });
 
-	if (!currentForm && !['list', 'setup'].includes(subcommand)) {
+	if (currentForm === null && !['list', 'setup'].includes(subcommand)) {
 		await interaction.reply({ content: 'This channel is not a form channel!', ephemeral: true });
 		return;
 	}
 
 	switch (subcommand) {
 	case 'submit': {
-		await submitCommand(interaction, currentForm);
+		await submitCommand(interaction, currentForm!);
 		break;
 	}
 	case 'setup': {
@@ -63,29 +63,29 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 		break;
 	}
 	case 'export': {
-		await exportCommand(interaction, currentForm);
+		await exportCommand(interaction, currentForm!);
 		break;
 	}
 	case 'erase': {
-		await eraseCommand(interaction, currentForm);
+		await eraseCommand(interaction, currentForm!);
 		break;
 	}
 	case 'edit': {
-		await editCommand(interaction, currentForm);
+		await editCommand(interaction, currentForm!);
 		break;
 	}
 	case 'list': {
-		const forms = await Forms.findAll();
+		const forms = await Form.findAll();
 		if (forms.length === 0) {
 			await interaction.reply({ content: 'No forms found!', ephemeral: true });
 		} else {
-			const formsList = forms.map((form: any) => `${channelMention(form.form_channel_id)} - ${form.title}`);
+			const formsList = forms.map((form) => `${channelMention(form.form_channel_id)} - ${form.title}`);
 			await interaction.reply({ content: formsList.join('\n'), ephemeral: true });
 		}
 		break;
 	}
 	case 'setmax': {
-		await setMaxCommand(interaction, currentForm);
+		await setMaxCommand(interaction, currentForm!);
 		break;
 	}
 	default: {

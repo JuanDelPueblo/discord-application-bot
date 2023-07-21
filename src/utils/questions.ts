@@ -1,7 +1,8 @@
-import { BaseInteraction, Message, ThreadChannel } from 'discord.js';
+import { BaseInteraction, ButtonInteraction, Message, StringSelectMenuInteraction, ThreadChannel } from 'discord.js';
 import { questionEmbed, selectQuestionEmbed } from './embeds.js';
+import Question from '../models/Question.model.js';
 
-export async function textQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: any) {
+export async function textQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: Question) {
 	return new Promise((resolve, reject) => {
 		try {
 			const embed = questionEmbed(thread, question);
@@ -67,7 +68,7 @@ export async function textQuestionCollector(interaction: BaseInteraction, thread
 	});
 }
 
-export async function numberQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: any) {
+export async function numberQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: Question) {
 	return new Promise((resolve, reject) => {
 		try {
 			const embed = questionEmbed(thread, question);
@@ -143,21 +144,23 @@ export async function numberQuestionCollector(interaction: BaseInteraction, thre
 	});
 }
 
-export async function selectQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: any) {
+export async function selectQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: Question) {
 	return new Promise((resolve, reject) => {
 		const embed = selectQuestionEmbed(thread, question);
 		thread.send(embed)
 			.then(async msg => {
 				const selectFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
-				const selection: any = await msg.awaitMessageComponent({ filter: selectFilter, time: 43_200_000 });
+				const selection = await msg.awaitMessageComponent({ filter: selectFilter, time: 43_200_000 }) as ButtonInteraction | StringSelectMenuInteraction;
 				await selection.deferUpdate();
 				if (selection.customId.startsWith('skip-')) {
 					await thread.send({ content: 'Question skipped.' });
 					resolve(undefined);
-					return;
+				} else if (selection instanceof StringSelectMenuInteraction) {
+					await thread.send({ content: `Your response was: ${selection.values}` });
+					resolve(selection.values);
+				} else {
+					resolve(undefined);
 				}
-				await thread.send({ content: `Your response was: ${selection.values}` });
-				resolve(selection.values);
 			})
 			.catch(async err => {
 				if (err.message === 'Collector received no interactions before ending with reason: time') {
@@ -177,7 +180,7 @@ export async function selectQuestionCollector(interaction: BaseInteraction, thre
 	});
 }
 
-export async function fileUploadQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: any) {
+export async function fileUploadQuestionCollector(interaction: BaseInteraction, thread: ThreadChannel, question: Question) {
 	return new Promise((resolve, reject) => {
 		try {
 			const embed = questionEmbed(thread, question);

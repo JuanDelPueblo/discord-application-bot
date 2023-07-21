@@ -1,16 +1,17 @@
 import { BaseInteraction, ChatInputCommandInteraction } from 'discord.js';
-import { Questions } from '../../database.js';
+import Form from '../../models/Form.model.js';
+import Question from '../../models/Question.model.js';
 import { questionRemoveEmbed } from '../../utils/embeds.js';
 
-export default async function removeCommand(interaction: ChatInputCommandInteraction, currentForm: any) {
+export default async function removeCommand(interaction: ChatInputCommandInteraction, currentForm: Form) {
 	const id = await interaction.options.getInteger('id');
 
-	const questions = await Questions.findAll({
+	const questions = await Question.findAll({
 		where: { form_channel_id: currentForm.form_channel_id },
 		order: [['order', 'ASC']],
 	});
 
-	const questionToRemove = questions.find((question: any) => question.question_id === id);
+	const questionToRemove = questions.find((question) => question.question_id === id);
 
 	if (!questionToRemove) {
 		await interaction.reply({ content: 'There is no question with that ID configured for this form!', ephemeral: true });
@@ -30,13 +31,13 @@ export default async function removeCommand(interaction: ChatInputCommandInterac
 		questions[i].order = questions[i].order - 1;
 	}
 
-	await Promise.all(questions.map((question: any) => question.save()));
+	await Promise.all(questions.map((question) => question.save()));
 
 	await questionToRemove.destroy();
 
 	await response.update({ content: 'The question has been removed from this form!', components: [], embeds: [] });
 
-	const updatedQuestions = await Questions.findAll({
+	const updatedQuestions = await Question.findAll({
 		where: { form_channel_id: currentForm.form_channel_id },
 	});
 
