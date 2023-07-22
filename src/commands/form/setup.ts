@@ -1,7 +1,7 @@
 import Form from '../../models/Form.model.js';
 import { editFormModal } from '../../utils/modals.js';
 import { formEmbed, formTutorialEmbed } from '../../utils/embeds.js';
-import { ChatInputCommandInteraction, ModalSubmitInteraction, Message } from 'discord.js';
+import { ChatInputCommandInteraction, ModalSubmitInteraction } from 'discord.js';
 
 export default async function setupCommand(interaction: ChatInputCommandInteraction) {
 	editFormModal(interaction)

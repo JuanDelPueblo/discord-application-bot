@@ -1,4 +1,4 @@
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageCreateOptions, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ThreadChannel, roleMention } from 'discord.js';
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ThreadChannel, roleMention } from 'discord.js';
 import { loadConfig } from '../index.js';
 import Form from '../models/Form.model.js';
 import Question from '../models/Question.model.js';

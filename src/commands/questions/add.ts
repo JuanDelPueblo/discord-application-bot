@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Collection, Message, ModalSubmitInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, Message, ModalSubmitInteraction } from 'discord.js';
 import Form from '../../models/Form.model.js';
 import { editQuestionModal } from '../../utils/modals.js';
 
