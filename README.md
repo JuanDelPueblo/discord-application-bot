@@ -1,5 +1,8 @@
 # Discord Application Bot
 
+![image](https://github.com/JuanDelPueblo/discord-application-bot/assets/49998039/3e092d36-ff01-4c4b-8aa5-be1c5dca8722)
+
+
 Create forms, receive applications, and choose who to approve, all within your own Discord server. Each form is managed in a single channel where the applications are answered inside threads.
 
 ## Key Features
