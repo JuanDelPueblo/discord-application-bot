@@ -43,7 +43,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 	switch (subcommand) {
 	case 'list': {
-		const roles = await Role.findAll({ where: { form_channel_id: currentForm.form_channel_id } });
+		const roles = await currentForm.$get('role');
 		if (roles.length === 0) {
 			await interaction.reply({ content: 'No roles have permissions for this form!', ephemeral: true });
 		} else {
@@ -51,8 +51,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 			const embed = new EmbedBuilder()
 				.setTitle('Roles with permissions for this form')
 				.setColor(color);
-				// set up embed fields with roles and permissions
-			roles.forEach((role: Role) => {
+			// set up embed fields with roles and permissions
+			roles.forEach((role) => {
 				const roleObj = interaction.guild!.roles.cache.get(role.role_id);
 				let rolePermissions = 'No permissions set for this role';
 				if (role.permission === 'view') rolePermissions = 'Can view applications';

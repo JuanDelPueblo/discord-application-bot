@@ -1,15 +1,11 @@
 import { BaseInteraction, ChatInputCommandInteraction } from 'discord.js';
 import Form from '../../models/Form.model.js';
-import Question from '../../models/Question.model.js';
 import { questionRemoveEmbed } from '../../utils/embeds.js';
 
 export default async function removeCommand(interaction: ChatInputCommandInteraction, currentForm: Form) {
 	const id = await interaction.options.getInteger('id');
 
-	const questions = await Question.findAll({
-		where: { form_channel_id: currentForm.form_channel_id },
-		order: [['order', 'ASC']],
-	});
+	const questions = await currentForm.$get('question', { order: [['order', 'ASC']] });
 
 	const questionToRemove = questions.find((question) => question.question_id === id);
 
@@ -37,9 +33,7 @@ export default async function removeCommand(interaction: ChatInputCommandInterac
 
 	await response.update({ content: 'The question has been removed from this form!', components: [], embeds: [] });
 
-	const updatedQuestions = await Question.findAll({
-		where: { form_channel_id: currentForm.form_channel_id },
-	});
+	const updatedQuestions = await currentForm.$get('question');
 
 	if (updatedQuestions.length < 1) {
 		await currentForm.update({ enabled: false });

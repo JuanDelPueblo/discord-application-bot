@@ -1,12 +1,12 @@
 import { ChatInputCommandInteraction, Message, ModalSubmitInteraction } from 'discord.js';
 import Form from '../../models/Form.model.js';
-import Question from '../../models/Question.model.js';
 import { editQuestionModal } from '../../utils/modals.js';
 
 export default async function editCommand(interaction: ChatInputCommandInteraction, currentForm: Form) {
 	const id = interaction.options.getInteger('id');
 
-	const existingQuestion = await Question.findOne({ where: { form_channel_id: currentForm.form_channel_id, question_id: id } });
+	const questions = await currentForm.$get('question');
+	const existingQuestion = questions.find((q) => q.question_id === id);
 	if (!existingQuestion) {
 		await interaction.reply({ content: 'There is no question with that ID configured for this form!', ephemeral: true });
 		return;
@@ -34,7 +34,7 @@ export default async function editCommand(interaction: ChatInputCommandInteracti
 			await existingQuestion.update({
 				title: questionTitle,
 				description: questionDescription,
-			}, { where: { form_channel_id: currentForm.form_channel_id, question_id: id } });
+			});
 
 			await modalInteraction.reply({ content: 'This question has been updated!', ephemeral: true });
 
@@ -74,11 +74,11 @@ export default async function editCommand(interaction: ChatInputCommandInteracti
 				if (options.length < 1) {
 					modalInteraction.followUp({ content: 'You must have at least 2 options!', ephemeral: true });
 				} else {
-					await Question.update({
+					await existingQuestion.update({
 						title: questionTitle,
 						description: questionDescription,
 						options: options,
-					}, { where: { form_channel_id: currentForm.form_channel_id, question_id: id } });
+						});
 					await modalInteraction.followUp({ content: 'This question has been updated!', ephemeral: true });
 				}
 			});

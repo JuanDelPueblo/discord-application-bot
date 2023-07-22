@@ -77,7 +77,7 @@ export async function execute(interaction: BaseInteraction) {
 				const rolePermissions = await form.$get('role');
 				for (const rolePermission of rolePermissions.filter(r => r.permission !== 'none')) {
 					const role = await interaction.guild!.roles.fetch(rolePermission.role_id);
-					if (role === undefined || null) continue;
+					if (role === undefined || role === null) continue;
 					const members = role!.members.values();
 					for (const member of members) {
 						await thread.members.add(member.user.id);
@@ -215,7 +215,8 @@ export async function execute(interaction: BaseInteraction) {
 				const member = await interaction.guild!.members.fetch(interaction.user.id);
 				let hasPermission = false;
 				for (const role of roles) {
-					if (role === undefined || null) continue;
+					console.log(role);
+					if (role === undefined || role === null) continue;
 					if (member.roles.cache.some(r => r.name === role!.name)) {
 						hasPermission = true;
 					}

@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, Collection, Message, ModalSubmitInteraction } from 'discord.js';
 import Form from '../../models/Form.model.js';
-import Question from '../../models/Question.model.js';
 import { editQuestionModal } from '../../utils/modals.js';
 
 export default async function addCommand(interaction: ChatInputCommandInteraction, currentForm: Form, type: string) {
@@ -21,7 +20,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 	const questionTitle = modalInteraction.fields.getTextInputValue(`question_title-${interaction.channel!.id}`);
 	const questionDescription = modalInteraction.fields.getTextInputValue(`question_description-${interaction.channel!.id}`) ?? '';
 
-	const questions = await Question.findAll({ where: { form_channel_id: currentForm.form_channel_id } });
+	const questions = await currentForm.$get('question');
 	const questionOrder = questions.length + 1;
 
 	try {
@@ -29,8 +28,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 		case 'text': {
 			if ((min ?? 1) > (max ?? 2000)) return modalInteraction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
 
-			await Question.create({
-				form_channel_id: currentForm.form_channel_id,
+			await currentForm.$create('question', {
 				type: type,
 				title: questionTitle,
 				description: questionDescription,
@@ -45,8 +43,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 		case 'number': {
 			if ((min ?? -Number.MAX_VALUE) > (max ?? Number.MAX_VALUE)) return modalInteraction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
 
-			await Question.create({
-				form_channel_id: currentForm.form_channel_id,
+			await currentForm.$create('question', {
 				type: type,
 				title: questionTitle,
 				description: questionDescription,
@@ -61,8 +58,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 		case 'fileupload': {
 			if ((min ?? 1) > (max ?? 10)) return modalInteraction.reply({ content: 'The minimum value cannot be greater than the maximum value!', ephemeral: true });
 
-			await Question.create({
-				form_channel_id: currentForm.form_channel_id,
+			await currentForm.$create('question', {
 				type: type,
 				title: questionTitle,
 				description: questionDescription,
@@ -120,8 +116,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 						max = options.length;
 					}
 	
-					await Question.create({
-						form_channel_id: currentForm.form_channel_id,
+					await  currentForm.$create('question', {
 						type: type,
 						title: questionTitle,
 						description: questionDescription,

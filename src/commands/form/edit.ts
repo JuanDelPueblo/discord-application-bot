@@ -1,7 +1,7 @@
 import Form from '../../models/Form.model.js';
 import { editFormModal } from '../../utils/modals.js';
 import { formEmbed } from '../../utils/embeds.js';
-import { ChatInputCommandInteraction, Message, ModalSubmitInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, ModalSubmitInteraction } from 'discord.js';
 
 export default async function editCommand(interaction: ChatInputCommandInteraction, currentForm: Form) {
 	editFormModal(interaction)
@@ -19,12 +19,12 @@ export default async function editCommand(interaction: ChatInputCommandInteracti
 				description: formDescription,
 				button_text: formButtonText,
 				embed_message_id: currentForm.embed_message_id,
-			}, { where: { form_channel_id: interaction.channel!.id } });
+			});
 
 			const embed = formEmbed(interaction, currentForm);
 			const message = await interaction.channel!.messages.fetch(currentForm.embed_message_id)
 			await message.edit(embed);
-			await modalInteraction.reply({ content: 'Form successfully edited!', ephemeral: true });		
+			await modalInteraction.reply({ content: 'Form successfully edited!', ephemeral: true });
 		})
 		.catch((err) => {
 			console.log(err);

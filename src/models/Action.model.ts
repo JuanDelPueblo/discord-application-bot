@@ -24,5 +24,5 @@ export default class Action extends Model {
 	declare message: string;
 
 	@Column({ type: DataType.STRING, allowNull: true })
-	reason: string;
+	declare reason: string;
 }

@@ -21,7 +21,6 @@
 		"useUnknownInCatchVariables": false, // TypeScript 4.4+ only!
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"strictPropertyInitialization": false,
 	},
 	"include": [
 		"src/**/*.ts",

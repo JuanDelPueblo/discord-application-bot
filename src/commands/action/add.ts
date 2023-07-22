@@ -1,12 +1,12 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import Form from '../../models/Form.model.js';
-import Action from '../../models/Action.model.js';
 
 export default async function addCommand(interaction: ChatInputCommandInteraction, currentForm: Form, action: string) {
 	const name = interaction.options.getString('name');
 	const when = interaction.options.getString('when');
-
-	const existingAction = await Action.findOne({ where: { form_channel_id: currentForm.form_channel_id, name: name } });
+	
+	const actions = await currentForm.$get('action');
+	const existingAction = actions.find((a) => a.name === name);
 	if (existingAction) {
 		await interaction.reply({ content: 'There is already an action with that name configured for this form!', ephemeral: true });
 		return;
@@ -18,8 +18,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 		case 'addrole': {
 			const role = interaction.options.getRole('role');
 
-			await Action.create({
-				form_channel_id: currentForm.form_channel_id,
+			await currentForm.$create('action', {
 				name: name,
 				when: when,
 				do: action,
@@ -33,8 +32,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 		case 'ban':
 		case 'kick': {
 			const reason = interaction.options.getString('reason');
-			await Action.create({
-				form_channel_id: currentForm.form_channel_id,
+			await currentForm.$create('action', {
 				name: name,
 				when: when,
 				do: action,
@@ -48,8 +46,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 		case 'sendmessage': {
 			const channel = interaction.options.getChannel('channel');
 			const message = interaction.options.getString('message');
-			await Action.create({
-				form_channel_id: currentForm.form_channel_id,
+			currentForm.$create('action', {
 				name: name,
 				when: when,
 				do: action,
@@ -63,8 +60,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 		case 'sendmessagedm': {
 			const message = interaction.options.getString('message');
 
-			await Action.create({
-				form_channel_id: currentForm.form_channel_id,
+			await currentForm.$create('action', {
 				name: name,
 				when: when,
 				do: action,
@@ -76,8 +72,7 @@ export default async function addCommand(interaction: ChatInputCommandInteractio
 			break;
 		}
 		case 'delete': {
-			await Action.create({
-				form_channel_id: currentForm.form_channel_id,
+			await currentForm.$create('action', {
 				name: name,
 				when: when,
 				do: action,
