@@ -1,5 +1,6 @@
 import { Model, Column, Table, DataType, BelongsTo } from 'sequelize-typescript';
 import Question from './Question.model.js';
+import Application from './Application.model.js'
 
 type AnswerContent = {
 	type: string;
@@ -19,4 +20,7 @@ export default class Answer extends Model {
 
 	@BelongsTo(() => Question, 'question_id')
 	declare question: Awaited<Question>;
+
+	@BelongsTo(() => Application, 'thread_id')
+	declare application: Awaited<Application>;
 }

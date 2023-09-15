@@ -8,7 +8,7 @@ export default class Application extends Model {
 	@Column({ type: DataType.STRING, allowNull: false })
 	declare form_channel_id: string;
 
-	@Column({ type: DataType.STRING, allowNull: false })
+	@Column({ type: DataType.STRING, allowNull: false, primaryKey: true })
 	declare thread_id: string;
 
 	@Column({ type: DataType.STRING, allowNull: false })
